@@ -1,0 +1,7 @@
+# Basic
+Input project list (json)
+Output
+	JSON
+	Mongo
+Tasks
+   
