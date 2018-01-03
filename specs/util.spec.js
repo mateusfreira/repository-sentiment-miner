@@ -11,6 +11,7 @@ describe('logProcess', function() {
     it('should not the process end', function() {
         const mock = sinon.mock(util.getLogger());
         mock.expects("log").never();
+        mock.expects("log").withArgs("Finishing", "[some]:test");
         util.logProcess("test", "end", "some");
         mock.verify();
     });
@@ -26,7 +27,7 @@ describe('startProcess', function() {
 describe('endProcess', function() {
     it('should log the process end ', function() {
         const mock = sinon.mock(util.getLogger());
-        mock.expects("log").never();
+        mock.expects("log").withArgs("Finishing", "[some]:test");
         util.logProcessEnd("test", "some");
         mock.verify();
     });
@@ -35,10 +36,12 @@ describe('getProjectLogger', function() {
     it('shoud return a logger to the project', function() {
         const mock = sinon.mock(util.getLogger());
         mock.expects("log").withArgs("[SomeProject]:test");
-        mock.expects("log").withArgs("Starting","[SomeProject]:test");
-        util.getProjectLogger("SomeProject").log("test");
-        util.getProjectLogger("SomeProject").start("test");
-        util.getProjectLogger("SomeProject").end("test");
+        mock.expects("log").withArgs("Starting", "[SomeProject]:test");
+        mock.expects("log").withArgs("Finishing", "[SomeProject]:test");
+        const logger = util.getProjectLogger("SomeProject");
+        logger.log("test");
+        logger.start("test");
+        logger.end("test");
     });
 
 });
