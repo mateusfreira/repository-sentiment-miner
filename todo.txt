@@ -4,4 +4,5 @@ Output
 	JSON
 	Mongo
 Tasks
-   
+  
+Paralelous processing of commits but a queue of commits cloning

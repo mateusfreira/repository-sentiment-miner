@@ -12,6 +12,13 @@ describe('git', function() {
             return git.moveToMaster('test', 'test').then(() => mock.verify());
         });
     });
+    describe('checkoutCommit', function() {
+        it('should checkoutCommit to  the disered folder', function() {
+            const mock = sinon.mock(util);
+            mock.expects('execPromise').once().withArgs('cd  test/test&&git --work-tree=thisIsAnotherFolder checkout 123f11 -- .').callsFake(() => Promise.resolve());
+            return git.checkoutCommitToFolder('test', 'test', '123f11', 'thisIsAnotherFolder').then(() => mock.verify());
+        });
+    });
     describe('clone', function() {
         it('should clone the repository', function() {
             const mock = sinon.mock(util);
