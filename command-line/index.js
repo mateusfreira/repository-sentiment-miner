@@ -9,6 +9,6 @@ program
     .alias('ls')
     .description('this is test command')
     .action((gitUrl, resultPath, projectName) => {
-        new ProjectAnaliser().analise(gitUrl, projectName, [require('../tasks/ls.js').run], 10, resultPath).then(console.log);
+        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], 10, resultPath).analise().then(console.log);
     });
 program.parse(process.argv);
