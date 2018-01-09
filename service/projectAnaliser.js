@@ -7,10 +7,11 @@ const util = require('../lib/util.js');
 const logger = util.getLogger();
 
 class ProjectAnaliser {
-    constructor(projectUrl, projectName, tasks, nProcesses, resultPath) {
+    constructor(projectUrl, projectName, tasks, outputer, nProcesses, resultPath) {
         this.nProcesses = nProcesses;
         this.logger = util.getProjectLogger(projectName);
         this.executor = new Executor();
+        this.outputer = outputer;
         this.commitsQueue = async.queue((commitBox, callback) => {
             this.logger.start(`process_${commitBox.commit.commit}`);
             const commitsFolder = `${resultPath}/${projectName}_commits`;
@@ -24,10 +25,12 @@ class ProjectAnaliser {
         return git.clone(projectUrl, projectName, resultPath)
             .then(git.getCommitsAsJson.bind(git, resultPath, projectName))
             .then(this.runTaskForEachCommit.bind(this, projectName, tasks, nProcesses, resultPath))
-            .tap(commitsDone)
+            .tap(commitsDone.bind(null, this))
             .then(() => this.commits.map(c => {
                 return _.omit(c, ['_pending', '_processed']);
-            }));
+            })).tap(commits => {
+                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits));
+            });
     }
     runTaskForEachCommit(projectName, tasks, nProcesses, resultPath, commits) {
         const commitsFolder = `${resultPath}/${projectName}_commits`;
@@ -41,7 +44,7 @@ function commitsDone(analiser) {
     analiser.notProcessed = analiser.commits;
     return new Promise((resolve) => {
         const canceler = setInterval(() => {
-            analiser.notProcessed = _.filter(analiser.notProcessed, '_processed');
+            analiser.notProcessed = _.filter(analiser.notProcessed, f => !f._processed);
             if (_.size(analiser.notProcessed) === 0) {
                 clearTimeout(canceler);
                 resolve();
@@ -54,7 +57,7 @@ function needsMoreCommit(analiser) {
     return new Promise((resolve) => {
         const canceler = setInterval(() => {
             const pending = _.filter(analiser.commits, '_pending');
-            if (_.size(pending) <= analiser.nProcesses) {
+            if (_.size(pending) <= (analiser.nProcesses + 1)) {
                 clearTimeout(canceler);
                 resolve();
             } else {

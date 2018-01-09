@@ -24,6 +24,9 @@ describe('ProjectAnaliser', function() {
                     }, 10);
                 }
             ];
+            const outputer = {
+                export: sinon.spy()
+            };
             const commits = [{
                 commit: "982137897d897123df"
             }];
@@ -34,7 +37,8 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
-            return new ProjectAnaliser('git://test.git', 'test', tasks, 1, '/tmp', commits).analise().then(o => {
+            return new ProjectAnaliser('git://test.git', 'test', tasks, outputer, 1, '/tmp', commits).analise().then(o => {
+                expect(outputer.export.calledWith('test', '/tmp', commits, sinon.match.any)).to.be.true();
                 expect(_.first(o)).to.have.all.keys('a', 'b', 'c', 'commit');
             });
         });

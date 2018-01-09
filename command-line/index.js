@@ -9,6 +9,14 @@ program
     .alias('ls')
     .description('this is test command')
     .action((gitUrl, resultPath, projectName, nProcesses) => {
-        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], nProcesses || 10, resultPath).analise().then(console.log);
+        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], require('../output/jsonFile.js'), nProcesses || 10, resultPath).analise().then(console.log);
+    });
+
+program
+    .command('execNode <taskFile> <gitUrl> <resultPath> <projectName> [processes]')
+    .alias('en')
+    .description('this is test command')
+    .action((taskFile, gitUrl, resultPath, projectName, nProcesses) => {
+        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require('../output/jsonFile.js'), nProcesses || 10, resultPath).analise().then(console.log);
     });
 program.parse(process.argv);
