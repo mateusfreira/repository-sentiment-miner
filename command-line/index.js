@@ -5,10 +5,10 @@ program
     .description('Commits miner helper');
 
 program
-    .command('lser <gitUrl> <resultPath> <projectName>')
+    .command('lser <gitUrl> <resultPath> <projectName> [processes]')
     .alias('ls')
     .description('this is test command')
-    .action((gitUrl, resultPath, projectName) => {
-        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], 10, resultPath).analise().then(console.log);
+    .action((gitUrl, resultPath, projectName, nProcesses) => {
+        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], nProcesses || 10, resultPath).analise().then(console.log);
     });
 program.parse(process.argv);

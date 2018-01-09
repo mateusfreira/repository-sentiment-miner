@@ -33,6 +33,7 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits&&mkdir /tmp/test_commits').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             return new ProjectAnaliser('git://test.git', 'test', tasks, 1, '/tmp', commits).analise().then(o => {
                 expect(_.first(o)).to.have.all.keys('a', 'b', 'c', 'commit');
             });
