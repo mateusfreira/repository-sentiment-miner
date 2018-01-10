@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const ProjectAnaliser = require('../service/projectAnaliser.js');
 const program = require('commander');
 program

@@ -1,6 +1,6 @@
 const util = require('../lib/util.js');
 
-exports.run = (projectName, path, commit, cb) => {
+exports.run = (projectName, path, util, logger, commit, cb) => {
     util.execPromise(`cd ${path}&&find .`).then(r => {
         commit.ls = r;
     });

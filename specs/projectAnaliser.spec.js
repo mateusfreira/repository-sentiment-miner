@@ -9,16 +9,17 @@ describe('ProjectAnaliser', function() {
     describe('runTaskForEachCommit', function() {
         it('should run the tasks for each commit', function() {
             const tasks = [
-                (projectName, path, a, c) => {
+                (projectName, path, util, logger, a, c) => {
                     a.a = 1;
                     c();
                 },
-                (projectName, path, b, c) => {
+                (projectName, path, util, logger, b, c) => {
                     b.b = 1;
                     c();
                 },
-                (projectName, path, c, callback) => {
+                (projectName, path, util, logger, c, callback) => {
                     setTimeout(() => {
+                       console.log(c); 
                         c.c = 1;
                         callback();
                     }, 10);

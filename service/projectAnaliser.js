@@ -89,7 +89,7 @@ function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commits
 
 function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback) {
     const commitTasks = tasks.map(t => {
-        return _.partial(t, projectName, commitBox.commitFolder);
+        return _.partial(t, projectName, commitBox.commitFolder, util, util.getProjectLogger(projectName));
     });
     return self.executor.executeTasks(commitTasks, commitBox.commit).tap(() => {
         return util.execPromise(`rm -Rf ${commitBox.commitFolder}`);
