@@ -15,5 +15,5 @@ Tasks
         [x] Callc code smells from the commit history
         [ ] Indentify start and end of code smells
 	[ ] Test
-        [ ] Fix the tests of Project analiser
+        [x] Fix the tests of Project analiser
     [ ] Add post processor on the tasks

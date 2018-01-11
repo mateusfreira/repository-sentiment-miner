@@ -29,7 +29,10 @@ class ProjectAnaliser {
             .then(() => this.commits.map(c => {
                 return _.omit(c, ['_pending', '_processed']);
             })).tap(commits => {
-                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits));
+                this.logger.start('callOuputer');
+                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits)).tap(() => {
+                    this.logger.end('callOuputer');
+                });
             });
     }
     runTaskForEachCommit(projectName, tasks, nProcesses, resultPath, commits) {
@@ -41,12 +44,14 @@ class ProjectAnaliser {
 }
 
 function commitsDone(analiser) {
+    analiser.logger.start('checkPeddingCommits');
     analiser.notProcessed = analiser.commits;
     return new Promise((resolve) => {
         const canceler = setInterval(() => {
             analiser.notProcessed = _.filter(analiser.notProcessed, f => !f._processed);
             if (_.size(analiser.notProcessed) === 0) {
                 clearTimeout(canceler);
+                analiser.logger.end('checkPeddingCommits');
                 resolve();
             }
         }, 1000);

@@ -19,15 +19,15 @@ describe('ProjectAnaliser', function() {
                 },
                 (projectName, path, util, logger, c, callback) => {
                     setTimeout(() => {
-                       console.log(c); 
                         c.c = 1;
                         callback();
                     }, 10);
                 }
             ];
             const outputer = {
-                export: sinon.spy()
+                export: () => {}
             };
+            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, cb) => cb());
             const commits = [{
                 commit: "982137897d897123df"
             }];
@@ -39,7 +39,7 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             return new ProjectAnaliser('git://test.git', 'test', tasks, outputer, 1, '/tmp', commits).analise().then(o => {
-                expect(outputer.export.calledWith('test', '/tmp', commits, sinon.match.any)).to.be.true();
+                expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
                 expect(_.first(o)).to.have.all.keys('a', 'b', 'c', 'commit');
             });
         });
