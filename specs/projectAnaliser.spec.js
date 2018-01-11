@@ -27,7 +27,7 @@ describe('ProjectAnaliser', function() {
             const outputer = {
                 export: () => {}
             };
-            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, cb) => cb());
+            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, util, logger, cb) => cb());
             const commits = [{
                 commit: "982137897d897123df"
             }];

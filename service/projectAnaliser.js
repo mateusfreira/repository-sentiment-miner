@@ -8,7 +8,7 @@ const logger = util.getLogger();
 
 class ProjectAnaliser {
     constructor(projectUrl, projectName, tasks, outputer, nProcesses, resultPath) {
-        this.nProcesses = nProcesses;
+        this.nProcesses = parseInt(nProcesses, 10) || 10;
         this.logger = util.getProjectLogger(projectName);
         this.executor = new Executor();
         this.outputer = outputer;
@@ -30,7 +30,7 @@ class ProjectAnaliser {
                 return _.omit(c, ['_pending', '_processed']);
             })).tap(commits => {
                 this.logger.start('callOuputer');
-                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits)).tap(() => {
+                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits, util, this.logger)).tap(() => {
                     this.logger.end('callOuputer');
                 });
             });

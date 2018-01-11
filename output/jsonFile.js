@@ -1,5 +1,3 @@
-const util = require('../lib/util.js');
-
-exports.export = (projectName, path, commits, cb) => {
+exports.export = (projectName, path, commits, util, logger, cb) => {
     util.writeObject(commits, `${path}/${projectName}_result.json`).asCallback(cb);
 };

@@ -20,6 +20,6 @@ program
     .description('execute a node file agains the script')
     .action((taskFile, gitUrl, resultPath, projectName, nProcesses, outputer) => {
         outputer = outputer || '../output/jsonFile.js';
-        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(console.log);
+        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(()=> console.log('finished'));
     });
 program.parse(process.argv);
