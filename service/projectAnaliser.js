@@ -101,4 +101,21 @@ function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, c
     }).asCallback(callback);
 
 }
-module.exports = ProjectAnaliser;
+
+class ProjectsAnaliser {
+    constructor(projects, tasks, outputer, nProcesses, resultPath) {
+        this.tasks = tasks;
+        this.outputer = outputer;
+        this.nProcesses = nProcesses;
+        this.projects = projects;
+        this.resultPath = resultPath;
+    }
+    analise() {
+        return Promise.fromCallback(async.forEachSeries.bind(null, this.projects, (project, cb) => {
+            new ProjectAnaliser(project.url, project.name, this.tasks, this.outputer, this.nProcesses, this.resultPath).analise().asCallback(cb);
+        }));
+    }
+
+}
+module.exports.ProjectAnaliser = ProjectAnaliser;
+module.exports.ProjectsAnaliser = ProjectsAnaliser;

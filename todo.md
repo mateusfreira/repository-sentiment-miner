@@ -16,5 +16,8 @@ Tasks
 	[x] Test
         [x] Fix the tests of Project analiser
     [x] Add post processor on the tasks
-    [ ] Add a mult project command line option to run in serie
+    [x] Add a mult project command line option to run in serie
     [ ] Add a progress log log the % of commits procesed already 
+    [ ] Create the command-line tool documentation
+    [ ] Create the language agnostic task executor
+    [ ] Create a demo video how to use the tool with node and with another language
