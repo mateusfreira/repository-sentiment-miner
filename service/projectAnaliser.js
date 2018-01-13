@@ -17,6 +17,8 @@ class ProjectAnaliser {
             const commitsFolder = `${resultPath}/${projectName}_commits`;
             return processSingleCommit(this, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
                 this.logger.end(`process_${commitBox.commit.commit}`);
+                const percent = (_.filter(this.commits, '_processed').length / this.commits.length) * 100;
+                this.logger.log(`processed ${percent}% of the commits`);
             })
         }, nProcesses);
         this.analise = _.partial(this._analise, projectUrl, projectName, tasks, nProcesses, resultPath);
