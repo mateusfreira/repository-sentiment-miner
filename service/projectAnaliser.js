@@ -2,26 +2,45 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const async = require('async');
 const git = require('../lib/git.js');
+const PersistenceManager = require('../model');
 const Executor = require('../executor');
 const util = require('../lib/util.js');
 const logger = util.getLogger();
 
 class ProjectAnaliser {
     constructor(projectUrl, projectName, tasks, outputer, nProcesses, resultPath) {
+        this.persistenceManager = new PersistenceManager(resultPath);
         this.nProcesses = parseInt(nProcesses, 10) || 10;
         this.logger = util.getProjectLogger(projectName);
         this.executor = new Executor();
         this.outputer = outputer;
+        this.project = {
+            name: projectName,
+            url: projectUrl,
+            percent: 0
+        };
+        this.persistenceManager.addProject(this.project);
         this.commitsQueue = async.queue((commitBox, callback) => {
             this.logger.start(`process_${commitBox.commit.commit}`);
             const commitsFolder = `${resultPath}/${projectName}_commits`;
             return processSingleCommit(this, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
                 this.logger.end(`process_${commitBox.commit.commit}`);
                 const percent = (_.filter(this.commits, '_processed').length / this.commits.length) * 100;
+                this.project.percent = percent;
                 this.logger.log(`processed ${percent}% of the commits`);
+                this.storeProjectIfSafe();
             })
         }, nProcesses);
         this.analise = _.partial(this._analise, projectUrl, projectName, tasks, nProcesses, resultPath);
+    }
+    storeProjectIfSafe(force) {
+        if (!this._saveProjectPromise || force) {
+            this.project.commits = this.commits;
+            this._saveProjectPromise = this.persistenceManager
+                .updateProject(this.project)
+                .then(() => this._saveProjectPromise = null);
+        }
+        return this._saveProjectPromise;
     }
     _analise(projectUrl, projectName, tasks, nProcesses, resultPath) {
         return git.clone(projectUrl, projectName, resultPath)
@@ -31,6 +50,7 @@ class ProjectAnaliser {
             .then(() => this.commits.map(c => {
                 return _.omit(c, ['_pending', '_processed']);
             })).tap(commits => {
+                this.storeProjectIfSafe(true);
                 this.logger.start('callOuputer');
                 return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits, util, this.logger)).tap(() => {
                     this.logger.end('callOuputer');

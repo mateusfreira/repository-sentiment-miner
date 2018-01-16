@@ -4,6 +4,7 @@ import { withStyles } from 'material-ui/styles';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import { LinearProgress } from 'material-ui/Progress';
 import Paper from 'material-ui/Paper';
+import axios from 'axios';
 
 const styles = theme => ({
       root: {
@@ -15,27 +16,32 @@ const styles = theme => ({
               minWidth: 700,
             },
 });
-
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-      id += 1;
-      return { id, name, calories, fat, carbs, protein };
-}
-
-const data = [
-      createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-      createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-      createData('Eclair', 262, 16.0, 24, 6.0),
-      createData('Cupcake', 305, 3, 67, 4.3),
-      createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
-function BasicTable(props) {
-      const { classes } = props;
-
+class ProjectTable extends React.Component {
+      constructor(props) {
+          super(props);
+          this.classes = props.classes;
+          this.state = {
+             projects: []
+         };
+     }
+    componentDidMount() {
+        axios.get(`http://localhost:8080/list`)
+            .then(res => {
+                const projects = res.data;
+                projects.map(p => axios.get(`http:\/\/localhost:8080\/project\/status\/${p.name}`).then((r) => Object.assign(p, r.data)).then(() =>
+                    this.setState({
+                        projects
+                    })
+                ))
+                this.setState({
+                    projects
+                });
+            });
+    }
+     render() {
       return (
-              <Paper className={classes.root}>
-                <Table className={classes.table}>
+              <Paper className={this.classes.root}>
+                <Table className={this.classes.table}>
                   <TableHead>
                     <TableRow>
                       <TableCell>Project</TableCell>
@@ -45,13 +51,13 @@ function BasicTable(props) {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {data.map(n => {
+                    {this.state.projects.map(n => {
                                     return (
                                                       <TableRow key={n.id}>
-                                                        <TableCell><a href={'/p/'+n.id}>{n.name}</a></TableCell>
-                                                        <TableCell numeric>{n.calories}</TableCell>
-                                                        <TableCell numeric>{n.fat}</TableCell>
-                                                        <TableCell numeric><LinearProgress mode="determinate" value={90} /></TableCell>
+                                                        <TableCell><a href={'/p/'+n.name}>{n.name}</a></TableCell>
+                                                        <TableCell numeric>{n.commitsCount}</TableCell>
+                                                        <TableCell numeric>{n.processedCount}</TableCell>
+                                                        <TableCell numeric><LinearProgress mode="determinate" value={n.percent} /></TableCell>
                                                       </TableRow>
                                                     );
                                   })}
@@ -59,10 +65,11 @@ function BasicTable(props) {
                 </Table>
               </Paper>
             );
+     }
 }
 
-BasicTable.propTypes = {
+ProjectTable.propTypes = {
       classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(BasicTable);
+export default withStyles(styles)(ProjectTable);
