@@ -28,17 +28,19 @@ class ProjectTable extends React.Component {
         axios.get(`http://localhost:8080/list`)
             .then(res => {
                 const projects = res.data;
-                projects.map(p => axios.get(`http:\/\/localhost:8080\/project\/status\/${p.name}`).then((r) => Object.assign(p, r.data)).then(() =>
-                    this.setState({
-                        projects
-                    })
-                ))
+                setInterval(() => {
+                    projects.map(p => axios.get(`http:\/\/localhost:8080\/project\/status\/${p.name}`).then((r) => Object.assign(p, r.data)).then(() =>
+                        this.setState({
+                            projects
+                        })
+                    ))
+                }, 3000);
                 this.setState({
                     projects
                 });
             });
     }
-     render() {
+    render() {
       return (
               <Paper className={this.classes.root}>
                 <Table className={this.classes.table}>

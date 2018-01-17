@@ -5,5 +5,6 @@ exports.run = (projectName, path, util, logger, commit, cb) => {
         commit.ls = r;
     });
     //asCallback(cb);
-    setTimeout(cb, 5000); //Simulate slow process
+    const someNumber = Math.random() * 10000;
+    setTimeout(cb, 10000 + someNumber); //Simulate slow process
 }

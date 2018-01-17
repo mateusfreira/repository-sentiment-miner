@@ -21,7 +21,10 @@ class ProjectAnaliser {
         };
         this.persistenceManager.addProject(this.project);
         this.commitsQueue = async.queue((commitBox, callback) => {
+            const commit = commitBox.commit;
             this.logger.start(`process_${commitBox.commit.commit}`);
+            commit._processing = true;
+            commit._start = Date.now();
             const commitsFolder = `${resultPath}/${projectName}_commits`;
             return processSingleCommit(this, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
                 this.logger.end(`process_${commitBox.commit.commit}`);
@@ -29,6 +32,13 @@ class ProjectAnaliser {
                 this.project.percent = percent;
                 this.logger.log(`processed ${percent}% of the commits`);
                 this.storeProjectIfSafe();
+            }).catch((e) => {
+                commitBox.commit._error = true;
+                commitBox.commit._errorMessage = e.message;
+                throw e;
+            }).finally(() => {
+                commit._end = Date.now();
+                commit._processing = false;
             })
         }, nProcesses);
         this.analise = _.partial(this._analise, projectUrl, projectName, tasks, nProcesses, resultPath);
@@ -48,7 +58,7 @@ class ProjectAnaliser {
             .then(this.runTaskForEachCommit.bind(this, projectName, tasks, nProcesses, resultPath))
             .tap(commitsDone.bind(null, this))
             .then(() => this.commits.map(c => {
-                return _.omit(c, ['_pending', '_processed']);
+                return _.omit(c, ['_pending', '_processed', '_processing', '_start', '_end']);
             })).tap(commits => {
                 this.storeProjectIfSafe(true);
                 this.logger.start('callOuputer');

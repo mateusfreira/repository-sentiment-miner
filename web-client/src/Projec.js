@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import { CircularProgress } from 'material-ui/Progress';
-
+import axios from 'axios';
 import Paper from 'material-ui/Paper';
 
 const styles = theme => ({
@@ -17,40 +17,56 @@ const styles = theme => ({
             },
 });
 
-let id = 0;
-function createData(name, status) {
-      id += 1;
-      return { id, name, status  };
-}
-
-const data = [
-      createData('51064491230da2775301d7e8d1fa1ccbb7314a2b', 'done'),
-      createData('51064491230da2775301d7e8d1fa1ccbb7314a21', 'processing'),
-      createData('51064491230da2775301d7e8d1fa1ccbb7314a123', 'waiting'),
-      createData('51064491230da2775301d7e8d1fa1ccbb73112322', 'waiting'),
-      createData('51064491230da2775301d7e8d1fa1ccbb7314123', 'waiting'),
-];
-
-function BasicTable(props) {
-      const { classes } = props;
-
-      return (
-              <Paper className={classes.root}>
-                <Table className={classes.table}>
+class ProjectPage extends React.Component {
+        constructor(props) {
+            super(props);
+            this.classes = props.classes;
+            this.projectName = props.match.params.projectId;
+            this.state = {
+                project: { commits: [] }
+            };
+        }
+        componentDidMount() {
+            setInterval(()=> {
+            axios.get(`http://localhost:8080/project/${this.projectName}`)
+                .then(res => {
+                    const project = res.data;
+                    if(project.commits)
+                    this.setState({
+                        project
+                    });
+                });
+        }, 1000);
+      }
+      render() {
+          return (
+              <Paper className={this.classes.root}>
+                <Table className={this.classes.table}>
                   <TableHead>
                     <TableRow>
                       <TableCell>Commit</TableCell>
-                      <TableCell numeric>progress</TableCell>
+                      <TableCell numeric>Elapsed time</TableCell>
+                      <TableCell>Progress</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {data.map(n => {
+                    {this.state.project.commits.map(n => {
                                     return (
-                                                      <TableRow key={n.id}>
-                                                        <TableCell><a href={'/p/'+n.id}>{n.name}</a></TableCell>
+                                                      <TableRow>
+                                                        <TableCell>{n.commit}</TableCell>
+                                                        <TableCell>{ (((n._end  ? new Date(n._end).getTime() : n._start ? new Date() : 0 ) - (n._start ? new Date(n._start).getTime() : 0))/1000).toFixed(2) }s</TableCell>
                                                         <TableCell>
-                                                            { 
-                                                             n.status !== 'processing' ? <span>{n.status}</span> : <CircularProgress className={10} color="accent" /> 
+                                                            {
+                                                             (n._pending || n._pending === undefined ) && !n._processing ? <span>Pending</span> : <span></span>
+                                                            }
+                                                            {
+                                                             n._processing ?   <CircularProgress className={10} color="accent" /> : <span></span>
+                                                            }
+                                                            {
+                                                             n._processed ?    <span> Ok</span> : <span></span>
+                                                            }
+                                                            {
+                                                             n._error ?    <span> Error: {n._errorMessage} </span> : <span></span>
                                                             }
                                                         </TableCell>
                                                       </TableRow>
@@ -60,10 +76,11 @@ function BasicTable(props) {
                 </Table>
               </Paper>
             );
+      }
 }
 
-BasicTable.propTypes = {
+ProjectPage.propTypes = {
       classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(BasicTable);
+export default withStyles(styles)(ProjectPage);

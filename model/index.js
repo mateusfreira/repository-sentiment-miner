@@ -5,9 +5,15 @@ class PersistenceManager {
     constructor(resultPath) {
         this._resultPath = resultPath;
     }
+
+    changeResultPath(path) {
+        this._resultPath = path;
+    }
+
     _getProjectFileName(project) {
         return `${this._resultPath}/${project.name}.db.json`;
     }
+
     addProject(project) {
         return util.writeObject(project, this._getProjectFileName(project));
     }
@@ -20,6 +26,7 @@ class PersistenceManager {
             name
         }));
     }
+
     findProjectsName() {
         return util.execPromise(`ls -1f ${this._resultPath} | grep \.db\.json$`).then((r) => {
             return r.split('\n').filter(_.identity).map(fileName => {
@@ -31,5 +38,12 @@ class PersistenceManager {
         });
     }
 
+    saveConfig(config) {
+        return util.writeObject(config, '/tmp/commits-miner-config.json');
+    }
+
+    loadConfig() {
+        return util.readJsonFile('/tmp/commits-miner-config.json');
+    }
 }
 module.exports = PersistenceManager;
