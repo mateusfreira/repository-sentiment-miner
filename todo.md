@@ -21,6 +21,6 @@ Tasks
     [ ] Create the command-line tool documentation
     [ ] Create the language agnostic task executor
     [ ] Create a demo video how to use the tool with node and with another language
-    [ ] Add brew install rocksdb to the stall guide
     [ ] Check fatal when project do not exists
-    [ ] Finish the commts page
+    [x] Finish the commits page
+    [ ] Improve UI
