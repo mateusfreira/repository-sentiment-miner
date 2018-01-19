@@ -23,4 +23,9 @@ Tasks
     [ ] Create a demo video how to use the tool with node and with another language
     [ ] Check fatal when project do not exists
     [x] Finish the commits page
-    [ ] Improve UI
+    [ ] Improve UI (check https://www.muicss.com/docs/v1/react/forms)
+    [ ] Restore processing after failure
+    [ ] Reduces data trafic of the commits check
+    [ ] Pretty good citation https://dibt.unimol.it/staff/fpalomba/documents/C4.pdf
+    [ ] Find tool to check code metrics
+    [ ] 

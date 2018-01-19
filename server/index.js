@@ -3,6 +3,8 @@ const _ = require('lodash');
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
 const PersistenceManager = require('../model/index.js');
 const persistenceManager = new PersistenceManager('/tmp');
+const util = require('../lib/util.js');
+const logger = util.getLogger();
 async function init() {
     const config = await persistenceManager.loadConfig();
     console.log(config);
@@ -51,8 +53,8 @@ async function init() {
         });
     });
 
-    server.get('/start', async function(req, res, next) {
-        const url = req.query.url;
+    server.post('/start', async function(req, res, next) {
+        const url = req.body.url;
         const name = _.head(_.takeRight(url.split(/\.|\//), 2));
         const config = await persistenceManager.loadConfig();
         const nProcess = config;
@@ -93,6 +95,7 @@ async function init() {
             res.send(projectToReturn);
             next();
         }).catch(e => {
+            logger.error('API', e);
             res.send(404, 'project not found')
         })
     });
