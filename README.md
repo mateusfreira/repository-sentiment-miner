@@ -13,10 +13,10 @@ Commits Miner manager all the complexty of processing commits history preparing 
 * This command executes one find on the directory of the project and storage the results on the commit object.
 */
 exports.run = (projectName, path, util, logger, commit, cb) => {
-util.execPromise(`cd ${path}&&find .`).then(r => {
-commit.ls = r;
-cb();
-});
+  util.execPromise(`cd ${path}&&find .`).then(r => {
+    commit.ls = r;
+    cb(); 
+  });
 }
 ```
 * ### Language agnostic
