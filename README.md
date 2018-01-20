@@ -22,7 +22,7 @@ exports.run = (projectName, path, util, logger, commit, cb) => {
 * ### Language agnostic
 * In any other language you only need to provide an executable ready to receive the following parameter
 ```bath
-your-company project_name commit_dir commit_info_in_json
+your-command project_name commit_dir commit_info_in_json
 ```
 * If you command return a json it will be parsed and attached to the commit object. If not the result is attached as text on the commit object (check https://github.com/mateusfreira/ck/blob/master/src/main/java/com/github/mauricioaniche/ck/Runner.java) for a simple example of Java
 
