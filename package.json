@@ -8,7 +8,10 @@
         "lib": "lib"
     },
     "scripts": {
-        "test": "mocha specs/"
+        "test": "mocha specs/",
+        "server": "node server/index.js",
+        "client": "cd ./web-client&&npm start",
+        "prepare": "npm i&&cd ./web-client&&npm i"
     },
     "repository": {
         "type": "git",
