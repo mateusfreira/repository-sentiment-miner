@@ -9,9 +9,9 @@
     },
     "scripts": {
         "test": "mocha specs/",
-        "server": "node server/index.js",
-        "client": "cd ./web-client&&npm start",
-        "prepare": "npm i&&cd ./web-client&&npm i"
+        "server": "./node_modules/.bin/pm2 start server/index.js",
+        "client": "./node_modules/.bin/http-server ./web-client/build",
+        "prepare": "npm i&&cd ./web-client&&npm i&&npm run build"
     },
     "repository": {
         "type": "git",
@@ -28,10 +28,12 @@
         "big-json": "^2.0.0",
         "bluebird": "^3.5.1",
         "commander": "^2.12.2",
+        "http-server": "^0.11.1",
         "leveldown": "^2.1.1",
         "levelup": "^2.0.1",
         "lodash": "^4.17.4",
         "log4js": "^2.4.1",
+        "pm2": "^2.9.1",
         "restify": "^6.3.4"
     },
     "devDependencies": {
