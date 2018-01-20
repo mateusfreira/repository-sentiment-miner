@@ -29,7 +29,6 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs(sinon.match(/random-lang-command/)).callsFake(() => Promise.resolve('{ "test": true  }'));
             return new ProjectAnaliser('git://test.git', 'test', tasks, outputer, 1, '/tmp').analise().then(o => {
                 expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
-                console.log(o);
                 expect(_.first(o)).to.have.all.keys(['command-result', 'commit']);
             });
         });
