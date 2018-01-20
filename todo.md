@@ -28,4 +28,5 @@ Tasks
     [ ] Reduces data trafic of the commits check
     [ ] Pretty good citation https://dibt.unimol.it/staff/fpalomba/documents/C4.pdf
     [ ] Find tool to check code metrics
-    [ ] 
+    [ ] add a tool in hava for https://github.com/mauricioaniche/ck
+

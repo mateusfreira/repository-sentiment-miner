@@ -21,8 +21,18 @@ program
     .description('execute a node file agains the script')
     .action((taskFile, gitUrl, resultPath, projectName, nProcesses, outputer) => {
         outputer = outputer || '../output/jsonFile.js';
-        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(()=> console.log('finished'));
+        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(() => console.log('finished'));
     });
+program
+    .command('execCommand <command> <resultName> <gitUrl> <resultPath> <projectName> [processes] [outputer]')
+    .alias('ec')
+    .description('execute command line for each commit')
+    .action((command, resultName, gitUrl, resultPath, projectName, nProcesses, outputer) => {
+        const tasks = [require('../tasks/external-command.js').run.bind(null, command, resultName)];
+        outputer = outputer || '../output/jsonFile.js';
+        new ProjectAnaliser(gitUrl, projectName, tasks, require(outputer), nProcesses || 10, resultPath).analise().then(() => console.log('finished'));
+    });
+
 program
     .command('execNodeProcts <taskFile> <projectJsonFile> <resultPath> [processes] [outputer]')
     .alias('enp')
@@ -30,6 +40,6 @@ program
     .action((taskFile, projectsFile, resultPath, nProcesses, outputer) => {
         const projects = require(projectsFile);
         outputer = outputer || '../output/jsonFile.js';
-        new ProjectsAnaliser(projects, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(()=> console.log('finished'));
+        new ProjectsAnaliser(projects, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(() => console.log('finished'));
     });
 program.parse(process.argv);

@@ -59,7 +59,13 @@ async function init() {
         const config = await persistenceManager.loadConfig();
         const nProcess = config;
         const resultPath = config.resultPath;
-        const tasks = config.tasks = config.tasks.split(',').map(task => require(task.trim()).run);
+        const tasks = config.tasks = config.tasks.split(',').map(task => {
+            const taskName = task.trim();
+            const isCommandLineTool = taskName.split(':').length > 1;
+            const [command, resultName] = taskName.split(':');
+            const taskRunner = isCommandLineTool ? require('../tasks/external-command.js').run.bind(null, command, resultName) : require(task.trim()).run;
+            return taskRunner;
+        });
         const outputer = require(config.outputer);
         const project = {
             name,
