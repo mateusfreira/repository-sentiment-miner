@@ -43,7 +43,7 @@ class PersistenceManager {
     }
 
     loadConfig() {
-        return util.readJsonFile('/tmp/commits-miner-config.json');
+        return util.readJsonFile('/tmp/commits-miner-config.json').catch(() => {  return {}; });
     }
 }
 module.exports = PersistenceManager;
