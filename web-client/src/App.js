@@ -1,32 +1,57 @@
 import React, { Component } from 'react';
-import './App.css';
-import ProjectTable from './ProjecsTable.js';
-import Project from './Projec.js';
+import ProjectsTable from './ProjectsTable.js';
+import Project from './Project.js';
 import ConfigForm from './ConfigForm.js';
 import AddProject from './AddProject.js';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import styled from 'styled-components';
+
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Welcome to Commits miner</h1>
+      <Container>
+        <Header>
+          <h1>Welcome to Commits miner</h1>
           <h2>
-            <a href="/"> Home </a> |
-            <a href="/config"> Config </a> |
-            <a href="/add"> Add </a> |
+            <HeaderOption href="/"> Home </HeaderOption> |
+            <HeaderOption href="/config"> Config </HeaderOption> |
+            <HeaderOption href="/add"> Add </HeaderOption> |
           </h2>
-        </header>
+        </Header>
         <Router>
-          <p className="App-intro">
-            <Route path="/" exact component={ProjectTable} />
+          <Paths>
+            <Route path="/" exact component={ProjectsTable} />
             <Route path="/config" exact component={ConfigForm} />
             <Route path="/add" exact component={AddProject} />
             <Route path="/p/:projectId" component={Project} />
-          </p>
+          </Paths>
         </Router>
-      </div>
+      </Container>
     );
   }
 }
+
+const Container = styled.div`
+  text-align: center;
+`;
+
+const Header = styled.header`
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+
+  > h1 {
+    font-size: 1.5em;
+  }
+`;
+
+const HeaderOption = styled.a`
+  text-decoration: none;
+`;
+
+const Paths = styled.div`
+  font-size: large;
+`;
+
 export default App;

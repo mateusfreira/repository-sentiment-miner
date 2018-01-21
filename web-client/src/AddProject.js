@@ -1,14 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import Table, {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow
-} from 'material-ui/Table';
-import { LinearProgress } from 'material-ui/Progress';
-import Paper from 'material-ui/Paper';
 import axios from 'axios';
 
 class AddProject extends React.Component {
@@ -20,12 +10,8 @@ class AddProject extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    this.state[name] = value;
-    this.setState(this.state);
+  handleInputChange(name, value) {
+    this.setState({ [name]: value });
   }
   handleSubmit(event) {
     axios
@@ -44,7 +30,9 @@ class AddProject extends React.Component {
           <input
             type="text"
             name="url"
-            onChange={this.handleInputChange}
+            onChange={e =>
+              this.handleInputChange(e.target.name, e.target.value)
+            }
             value={this.state.url}
           />
         </label>

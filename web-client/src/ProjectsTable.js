@@ -73,7 +73,7 @@ class ProjectTable extends React.Component {
 }
 function updateProjectState(project, projects, component) {
   axios
-    .get(`http:\/\/localhost:8080\/project\/status\/${project.name}`)
+    .get(`http://localhost:8080/project/status/${project.name}`)
     .then(r => Object.assign(project, r.data))
     .then(() =>
       component.setState({
