@@ -1,28 +1,17 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import Table, {
+import {
+  Table,
   TableBody,
-  TableCell,
-  TableHead,
-  TableRow
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn
 } from 'material-ui/Table';
-import { LinearProgress } from 'material-ui/Progress';
+import CircularProgress from 'material-ui/CircularProgress';
 import Paper from 'material-ui/Paper';
 import axios from 'axios';
 import _ from 'lodash';
 import swal from 'sweetalert2';
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto'
-  },
-  table: {
-    minWidth: 700
-  }
-});
 
 class ProjectTable extends Component {
   constructor(props) {
@@ -50,28 +39,31 @@ class ProjectTable extends Component {
   }
   render() {
     return (
-      <Paper className={this.classes.root}>
-        <Table className={this.classes.table}>
-          <TableHead>
+      <Paper style={style.root}>
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell>Project</TableCell>
-              <TableCell numeric>total commits</TableCell>
-              <TableCell numeric>processed commits</TableCell>
-              <TableCell numeric>progress</TableCell>
+              <TableHeaderColumn>Project</TableHeaderColumn>
+              <TableHeaderColumn>total commits</TableHeaderColumn>
+              <TableHeaderColumn>processed commits</TableHeaderColumn>
+              <TableHeaderColumn>progress</TableHeaderColumn>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {this.state.projects.map(n => {
               return (
                 <TableRow key={n.id}>
-                  <TableCell>
+                  <TableRowColumn>
                     <a href={'/p/' + n.name}>{n.name}</a>
-                  </TableCell>
-                  <TableCell numeric>{n.commitsCount}</TableCell>
-                  <TableCell numeric>{n.processedCount}</TableCell>
-                  <TableCell numeric>
-                    <LinearProgress mode="determinate" value={n.percent || 0} />
-                  </TableCell>
+                  </TableRowColumn>
+                  <TableRowColumn numeric>{n.commitsCount}</TableRowColumn>
+                  <TableRowColumn numeric>{n.processedCount}</TableRowColumn>
+                  <TableRowColumn numeric>
+                    <CircularProgress
+                      mode="determinate"
+                      value={n.percent || 0}
+                    />
+                  </TableRowColumn>
                 </TableRow>
               );
             })}
@@ -99,8 +91,12 @@ function updateProjectState(project, projects, component) {
     });
 }
 
-ProjectTable.propTypes = {
-  classes: PropTypes.object.isRequired
+const style = {
+  root: {
+    width: '100%',
+    marginTop: '20px',
+    overflowX: 'auto'
+  }
 };
 
-export default withStyles(styles)(ProjectTable);
+export default ProjectTable;

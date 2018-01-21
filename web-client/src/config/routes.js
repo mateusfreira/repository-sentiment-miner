@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 
 /* Screens */
@@ -9,14 +9,12 @@ import ConfigScreen from '../screens/Config.jsx';
 import AddProject from '../screens/AddProject.jsx';
 
 const Routes = () => (
-  <Router>
-    <Paths>
-      <Route exact path="/" component={HomeScreen} />
-      <Route path="/config" component={ConfigScreen} />
-      <Route path="/add" component={AddProject} />
-      <Route path="/p/:projectId" component={Project} />
-    </Paths>
-  </Router>
+  <Paths>
+    <Route exact path="/" component={HomeScreen} />
+    <Route path="/config" component={ConfigScreen} />
+    <Route path="/add" component={AddProject} />
+    <Route path="/p/:projectId" component={Project} />
+  </Paths>
 );
 
 const Paths = styled.div`

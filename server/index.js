@@ -54,6 +54,7 @@ async function init() {
     });
 
     server.post('/start', async function(req, res, next) {
+        console.log('receive start request...');
         const url = req.body.url;
         const name = _.head(_.takeRight(url.split(/\.|\//), 2));
         const config = await persistenceManager.loadConfig();
@@ -78,6 +79,7 @@ async function init() {
         next();
     });
     server.get('/list', function(req, res, next) {
+        console.log('receive list request...');
         persistenceManager.findProjectsName().then(projects => {
             res.send(projects);
             next();

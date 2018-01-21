@@ -1,26 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
 import Table, {
   TableBody,
   TableCell,
   TableHead,
   TableRow
 } from 'material-ui/Table';
-import { CircularProgress } from 'material-ui/Progress';
+import CircularProgress from 'material-ui/CircularProgress';
 import axios from 'axios';
 import Paper from 'material-ui/Paper';
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto'
-  },
-  table: {
-    minWidth: 700
-  }
-});
 
 class ProjectPage extends React.Component {
   constructor(props) {
@@ -46,8 +34,8 @@ class ProjectPage extends React.Component {
   }
   render() {
     return (
-      <Paper className={this.classes.root}>
-        <Table className={this.classes.table}>
+      <Paper style={style.root}>
+        <Table style={style.table}>
           <TableHead>
             <TableRow>
               <TableCell>Commit</TableCell>
@@ -98,8 +86,19 @@ class ProjectPage extends React.Component {
   }
 }
 
+const style = {
+  root: {
+    width: '100%',
+    marginTop: '20px',
+    overflowX: 'auto'
+  },
+  table: {
+    minWidth: 700
+  }
+};
+
 ProjectPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(ProjectPage);
+export default ProjectPage;

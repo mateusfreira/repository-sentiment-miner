@@ -6,12 +6,10 @@ class ConfigForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      config: {
-        resultPath: '/tmp',
-        nProcesses: 3,
-        tasks: '../tasks/ls.js',
-        outputer: '../output/jsonFile.js'
-      }
+      resultPath: '/tmp',
+      nProcesses: 3,
+      tasks: '../tasks/ls.js',
+      outputer: '../output/jsonFile.js'
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -19,9 +17,9 @@ class ConfigForm extends Component {
   componentDidMount() {
     axios
       .get(`http://localhost:8080/config`)
-      .then(res => {
-        const config = res.data;
-        this.setState({ config });
+      .then(({ data }) => {
+        console.log(...data);
+        this.setState({ ...data });
       })
       .catch(err => {
         swal(
@@ -32,13 +30,12 @@ class ConfigForm extends Component {
       });
   }
   handleInputChange(name, value) {
-    const config = Object.assign({}, this.state.config);
-    config[name] = value;
-    this.setState({ config });
+    this.setState({ [name]: value });
   }
   handleSubmit(event) {
+    const config = { ...this.state };
     axios
-      .post(`http://localhost:8080/config`, this.state.config)
+      .post(`http://localhost:8080/config`, config)
       .then(res => {
         alert('Saved!');
       })
@@ -56,7 +53,7 @@ class ConfigForm extends Component {
             onChange={e =>
               this.handleInputChange(e.target.name, e.target.value)
             }
-            value={this.state.config.resultPath}
+            value={this.state.resultPath}
           />
         </label>
         <label>
@@ -67,7 +64,7 @@ class ConfigForm extends Component {
             onChange={e =>
               this.handleInputChange(e.target.name, e.target.value)
             }
-            value={this.state.config.tasks}
+            value={this.state.tasks}
           />
         </label>
         <label>
@@ -78,7 +75,7 @@ class ConfigForm extends Component {
             onChange={e =>
               this.handleInputChange(e.target.name, e.target.value)
             }
-            value={this.state.config.outputer}
+            value={this.state.outputer}
           />
         </label>
         <label>
@@ -89,7 +86,7 @@ class ConfigForm extends Component {
             onChange={e =>
               this.handleInputChange(e.target.name, e.target.value)
             }
-            value={this.state.config.nProcesses}
+            value={this.state.nProcesses}
           />
         </label>
         <input type="submit" value="Submit" />
