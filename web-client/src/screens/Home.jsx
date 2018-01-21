@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Table, {
@@ -11,6 +11,8 @@ import { LinearProgress } from 'material-ui/Progress';
 import Paper from 'material-ui/Paper';
 import axios from 'axios';
 import _ from 'lodash';
+import swal from 'sweetalert2';
+
 const styles = theme => ({
   root: {
     width: '100%',
@@ -21,7 +23,8 @@ const styles = theme => ({
     minWidth: 700
   }
 });
-class ProjectTable extends React.Component {
+
+class ProjectTable extends Component {
   constructor(props) {
     super(props);
     this.classes = props.classes;
@@ -30,13 +33,20 @@ class ProjectTable extends React.Component {
     };
   }
   componentDidMount() {
-    axios.get(`http://localhost:8080/list`).then(res => {
-      const projects = res.data;
-      projects.forEach(_.partial(updateProjectState, _, projects, this));
-      this.setState({
-        projects
+    axios
+      .get(`http://localhost:8080/list`)
+      .then(res => {
+        const projects = res.data;
+        projects.forEach(_.partial(updateProjectState, _, projects, this));
+        this.setState({ projects });
+      })
+      .catch(err => {
+        swal(
+          'Ops...',
+          `${err.message}. Check if commits miner is running correctly.`,
+          'error'
+        );
       });
-    });
   }
   render() {
     return (
@@ -71,6 +81,7 @@ class ProjectTable extends React.Component {
     );
   }
 }
+
 function updateProjectState(project, projects, component) {
   axios
     .get(`http://localhost:8080/project/status/${project.name}`)
@@ -87,6 +98,7 @@ function updateProjectState(project, projects, component) {
       );
     });
 }
+
 ProjectTable.propTypes = {
   classes: PropTypes.object.isRequired
 };

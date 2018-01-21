@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import App from './screens/App.jsx';
+import registerServiceWorker from './config/registerServiceWorker';
 import { injectGlobal } from 'styled-components';
+
+/* CSS Libs */
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 /* Global style */
 injectGlobal([

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
+import swal from 'sweetalert2';
 
-class ConfigForm extends React.Component {
+class ConfigForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,10 +17,19 @@ class ConfigForm extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
   componentDidMount() {
-    axios.get(`http://localhost:8080/config`).then(res => {
-      const config = res.data;
-      this.setState({ config });
-    });
+    axios
+      .get(`http://localhost:8080/config`)
+      .then(res => {
+        const config = res.data;
+        this.setState({ config });
+      })
+      .catch(err => {
+        swal(
+          'Ops...',
+          `${err.message}. Check if commits miner is running correctly.`,
+          'error'
+        );
+      });
   }
   handleInputChange(name, value) {
     const config = Object.assign({}, this.state.config);

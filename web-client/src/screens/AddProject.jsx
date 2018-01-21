@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import swal from 'sweetalert2';
 
 class AddProject extends React.Component {
   constructor(props) {
@@ -19,7 +20,13 @@ class AddProject extends React.Component {
       .then(res => {
         alert('Started!');
       })
-      .catch(() => alert('Error!'));
+      .catch(err => {
+        swal(
+          'Ops...',
+          `${err.message}. Check if commits miner is running correctly.`,
+          'error'
+        );
+      });
     event.preventDefault();
   }
   render() {

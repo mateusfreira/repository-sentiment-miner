@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
-import ProjectsTable from './ProjectsTable.js';
-import Project from './Project.js';
-import ConfigForm from './ConfigForm.js';
-import AddProject from './AddProject.js';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
 import styled from 'styled-components';
+import Routes from '../config/routes';
 
 class App extends Component {
   render() {
@@ -18,14 +14,7 @@ class App extends Component {
             <HeaderOption href="/add"> Add </HeaderOption> |
           </h2>
         </Header>
-        <Router>
-          <Paths>
-            <Route path="/" exact component={ProjectsTable} />
-            <Route path="/config" exact component={ConfigForm} />
-            <Route path="/add" exact component={AddProject} />
-            <Route path="/p/:projectId" component={Project} />
-          </Paths>
-        </Router>
+        <Routes />
       </Container>
     );
   }
@@ -48,10 +37,6 @@ const Header = styled.header`
 
 const HeaderOption = styled.a`
   text-decoration: none;
-`;
-
-const Paths = styled.div`
-  font-size: large;
 `;
 
 export default App;
