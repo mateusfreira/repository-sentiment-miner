@@ -33,3 +33,4 @@ Tasks
     [ ] Add a start end filter on commits miner
     [ ] Add a timeou on the tasks
     [ ] Add feature to remove projects from list
+    [ ] Compare with https://github.com/mauricioaniche/repodriller
