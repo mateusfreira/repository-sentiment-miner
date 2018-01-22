@@ -20,8 +20,14 @@ const HeaderOptions = () => (
   </OptionsContainer>
 );
 
+const Title = () => (
+  <StyledTitle>
+    <Link to="/">Commits Miner</Link>
+  </StyledTitle>
+);
+
 const Header = () => (
-  <AppBar title={<span>Commits miner</span>} showMenuIconButton={false}>
+  <AppBar title={<Title />} showMenuIconButton={false}>
     <HeaderOptions />
   </AppBar>
 );
@@ -30,7 +36,7 @@ const Option = styled(Link)`
   text-decoration: none;
 
   &:visited {
-    color: white;
+    color: #fafafa;
   }
 `;
 
@@ -40,6 +46,20 @@ const Button = styled(FlatButton)`
 
 const OptionsContainer = styled.div`
   margin: auto 0;
+`;
+
+const StyledTitle = styled.div`
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+
+  > a {
+    text-decoration: none;
+  }
+
+  > a:visited {
+    color: #fafafa;
+  }
 `;
 
 export default Header;

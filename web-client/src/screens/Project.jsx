@@ -57,6 +57,24 @@ class ProjectPage extends React.Component {
       1000
     ).toFixed(2)}s`;
   }
+  getProgress(commit) {
+    let resultComponent = null;
+
+    if (
+      (commit._pending || commit._pending === undefined) &&
+      !commit._processing
+    ) {
+      resultComponent = <span>Pending</span>;
+    } else if (commit._processed) {
+      resultComponent = <span>Ok</span>;
+    } else if (commit._error) {
+      resultComponent = <span>Error: {commit._errorMessage}</span>;
+    } else {
+      resultComponent = <CircularProgress />;
+    }
+
+    return resultComponent;
+  }
   render() {
     return (
       <GridCard>
@@ -79,25 +97,7 @@ class ProjectPage extends React.Component {
               <TableRow key={commit.commit}>
                 <TableRowColumn>{commit.commit}</TableRowColumn>
                 <TableRowColumn>{this.geElapsedTime(commit)}</TableRowColumn>
-                <TableRowColumn>
-                  {(commit._pending || commit._pending === undefined) &&
-                  !commit._processing ? (
-                    <span>Pending</span>
-                  ) : (
-                    <span />
-                  )}
-                  {commit._processing ? (
-                    <CircularProgress className={10} color="accent" />
-                  ) : (
-                    <span />
-                  )}
-                  {commit._processed ? <span> Ok</span> : <span />}
-                  {commit._error ? (
-                    <span> Error: {commit._errorMessage} </span>
-                  ) : (
-                    <span />
-                  )}
-                </TableRowColumn>
+                <TableRowColumn>{this.getProgress(commit)}</TableRowColumn>
               </TableRow>
             ))}
           </TableBody>
