@@ -11,7 +11,7 @@
         "test": "mocha specs/",
         "server": "./node_modules/.bin/pm2 start server/index.js",
         "client": "./node_modules/.bin/http-server ./web-client/build",
-        "prepare": "npm i&&cd ./web-client&&npm i&&npm run build"
+        "prepare": "cd ./web-client&&npm i&&npm run build"
     },
     "repository": {
         "type": "git",
