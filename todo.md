@@ -7,7 +7,7 @@ Tasks
 # Todo
 	[x] Paralelous processing of commits but a queue of commits cloning -> Done
 	[x] Checkout a limited number of commits
-       		[x] Add a coordinator do the commits processing
+        [x] Add a coordinator do the commits processing
 		[x] Checkout n +1 commits while waiting for them to be processed
 	[x] Implement output options and extentions
 	[ ] Implement codesmells tasks
@@ -24,10 +24,12 @@ Tasks
     [ ] Check fatal when project do not exists
     [x] Finish the commits page
     [ ] Improve UI (check https://www.muicss.com/docs/v1/react/forms)
+        [ ] Improve updateProjectState method on Home screen (sort of a requests overflow)
     [ ] Restore processing after failure
     [ ] Reduces data trafic of the commits check
     [ ] Pretty good citation https://dibt.unimol.it/staff/fpalomba/documents/C4.pdf
     [ ] Find tool to check code metrics
-    [ ] add a tool in hava for https://github.com/mauricioaniche/ck
-    [ ] add a start end filter on commits miner
+    [ ] Add a tool in hava for https://github.com/mauricioaniche/ck
+    [ ] Add a start end filter on commits miner
     [ ] Add a timeou on the tasks
+    [ ] Add feature to remove projects from list
