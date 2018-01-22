@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
-const container = (WrappedComponent, config) => {
+const container = WrappedComponent => {
   return class extends PureComponent {
     render() {
       return (
