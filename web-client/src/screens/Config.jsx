@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
+import container from '../components/Container.jsx';
 
 /* UI Components */
 import { Card, CardTitle, CardText } from 'material-ui/Card';
@@ -83,55 +84,26 @@ class ConfigForm extends Component {
   }
   render() {
     return (
-      <VerticalContainer>
-        <VerticalContent>
-          <Container>
-            <Card>
-              <CardTitle
-                title="Configuration"
-                subtitle="Set the properties above to configure your project"
-              />
-              <CardText>
-                <form onSubmit={this.handleSubmit}>
-                  <InputsContainer>{this.renderInputs()}</InputsContainer>
-                  <Button
-                    label="Save"
-                    type="submit"
-                    onClick={() => this.handleSubmit}
-                    fullWidth
-                  />
-                </form>
-              </CardText>
-            </Card>
-          </Container>
-        </VerticalContent>
-      </VerticalContainer>
+      <Card>
+        <CardTitle
+          title="Configuration"
+          subtitle="Set the properties above to configure your project"
+        />
+        <CardText>
+          <form onSubmit={this.handleSubmit}>
+            <InputsContainer>{this.renderInputs()}</InputsContainer>
+            <Button
+              label="Save"
+              type="submit"
+              onClick={() => this.handleSubmit}
+              fullWidth
+            />
+          </form>
+        </CardText>
+      </Card>
     );
   }
 }
-
-const VerticalContainer = styled.div`
-  top: 0;
-  left: 0;
-  text-align: center;
-  height: 100vh;
-  width: 100%;
-  display: table;
-  position: absolute;
-`;
-
-const VerticalContent = styled.div`
-  min-width: 350px;
-  padding: 12px;
-  vertical-align: middle;
-  display: table-cell;
-`;
-
-const Container = styled.div`
-  margin: auto;
-  max-width: 80%;
-  text-align: center;
-`;
 
 const InputsContainer = styled.div`
   margin: auto;
@@ -142,4 +114,4 @@ const Button = styled(RaisedButton)`
   margin-top: 14px;
 `;
 
-export default ConfigForm;
+export default container(ConfigForm);

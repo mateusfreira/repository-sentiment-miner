@@ -1,6 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import swal from 'sweetalert2';
+import styled from 'styled-components';
+import container from '../components/Container.jsx';
+
+/* UI Components */
+import { Card, CardTitle, CardText } from 'material-ui/Card';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 class AddProject extends React.Component {
   constructor(props) {
@@ -18,7 +25,7 @@ class AddProject extends React.Component {
     axios
       .post(`http://localhost:8080/start`, { url: this.state.url })
       .then(res => {
-        alert('Started!');
+        swal('Saved!', 'Your project has been added.', 'success');
       })
       .catch(err => {
         swal(
@@ -31,22 +38,37 @@ class AddProject extends React.Component {
   }
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Git URL:
-          <input
-            type="text"
-            name="url"
-            onChange={e =>
-              this.handleInputChange(e.target.name, e.target.value)
-            }
-            value={this.state.url}
-          />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
+      <Card>
+        <CardTitle
+          title="Add project"
+          subtitle="Remember to use SSH or HTTPS"
+        />
+        <CardText>
+          <form onSubmit={this.handleSubmit}>
+            <TextField
+              floatingLabelText="Insert your URL here"
+              name="url"
+              onChange={e =>
+                this.handleInputChange(e.target.name, e.target.value)
+              }
+              value={this.state.url}
+              fullWidth
+            />
+            <Button
+              label="Save"
+              type="submit"
+              onClick={() => this.handleSubmit}
+              fullWidth
+            />
+          </form>
+        </CardText>
+      </Card>
     );
   }
 }
 
-export default AddProject;
+const Button = styled(RaisedButton)`
+  margin-top: 14px;
+`;
+
+export default container(AddProject);
