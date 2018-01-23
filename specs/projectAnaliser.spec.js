@@ -9,6 +9,9 @@ const git = require('../lib/git.js');
 describe('ProjectAnaliser', function() {
     describe('runTaskForEachCommit', function() {
         const mock = sinon.mock(util);
+        after(() => {
+            mock.restore();
+        });
         it('should run the command tasks for each commit', function() {
             const tasks = [
                 require('../tasks/external-command.js').run.bind(null, 'random-lang-command', 'command-result')
