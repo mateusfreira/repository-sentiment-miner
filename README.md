@@ -1,6 +1,6 @@
 # Commits Miner
 Commits miner is a tool to process and extract useful information from commits history in git repositories.
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
+[![Build Status](https://travis-ci.org/mateusfreira/commits-miner.svg?branch=master)](https://travis-ci.org/mateusfreira/commits-miner) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
 # What does it do
 Commits Miner manager all the complexity of processing commits history preparing the directories with the code at the time of commit you want to process and managing all the tasks processing the commit as well as clearing the environment after processing the information
 * ## Paralelous
