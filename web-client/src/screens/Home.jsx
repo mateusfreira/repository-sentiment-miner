@@ -109,7 +109,7 @@ function updateProjectState(project, projects, component) {
     .then(({ data }) => Object.assign(project, data))
     .then(() => component.setState({ projects }))
     .finally(() => {
-      if (project.percent != 100) {
+      if (project.percent !== 100) {
         setTimeout(
           updateProjectState.bind(null, project, projects, component),
           3000
