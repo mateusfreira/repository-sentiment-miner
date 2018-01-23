@@ -108,11 +108,13 @@ function updateProjectState(project, projects, component) {
     .get(`http://localhost:8080/project/status/${project.name}`)
     .then(({ data }) => Object.assign(project, data))
     .then(() => component.setState({ projects }))
-    .then(() => {
-      setTimeout(
-        updateProjectState.bind(null, project, projects, component),
-        3000
-      );
+    .finally(() => {
+      if (project.percent != 100) {
+        setTimeout(
+          updateProjectState.bind(null, project, projects, component),
+          3000
+        );
+      }
     });
 }
 

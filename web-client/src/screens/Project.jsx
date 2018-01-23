@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import axios from 'axios';
 
@@ -28,22 +29,31 @@ class ProjectPage extends React.Component {
     this.handleRequestClose = this.handleRequestClose.bind(this);
   }
   componentDidMount() {
-    const intervalId = setInterval(() => {
+    const self = this;
+    const updateProjectStatus = () => {
       axios
         .get(`http://localhost:8080/project/${this.projectName}`)
         .then(({ data }) => {
           const project = data;
-          if (project.commits) this.setState({ project });
+          if (project.commits) {
+            this.setState({
+              project
+            });
+            if (_.some(project.commits, '_pending') && self.state.update) {
+              setTimeout(updateProjectStatus, 1000);
+            }
+          }
         });
-    }, 1000);
-    console.log('Setting new interval: ', intervalId);
-    this.setState({ intervalId });
+    };
+    updateProjectStatus();
+    this.setState({
+      update: true
+    });
   }
   componentWillUnmount() {
-    const { intervalId } = this.state;
-    if (intervalId) {
-      clearInterval(intervalId);
-    }
+    this.setState({
+      update: false
+    });
   }
   handleRequestClose = () => {
     this.setState({ isSnackOpened: false });
