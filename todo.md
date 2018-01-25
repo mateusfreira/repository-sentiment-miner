@@ -25,7 +25,7 @@ Tasks
     [x] Finish the commits page
     [x] Improve UI 
         [x] Improve updateProjectState method on Home screen (sort of a requests overflow)
-    [ ] Restore processing after failure
+    [x] Restore processing after failure
     [ ] Reduces data trafic of the commits check
     [ ] Pretty good citation https://dibt.unimol.it/staff/fpalomba/documents/C4.pdf
     [ ] Find tool to check code metrics

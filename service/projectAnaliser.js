@@ -8,17 +8,19 @@ const util = require('../lib/util.js');
 const logger = util.getLogger();
 
 class ProjectAnaliser {
-    constructor(projectUrl, projectName, tasks, outputer, nProcesses, resultPath) {
+    constructor(project) {
+        const projectName = project.name;
+        const projectUrl = project.url;
+        const tasks = getTasks(project.tasks);
+        const outputer = _.first(getTasks([project.outputer], 'export'));
+        const resultPath = project.resultPath;
+        this.commits = project.commits;
+        this.project = project;
         this.persistenceManager = new PersistenceManager(resultPath);
-        this.nProcesses = parseInt(nProcesses, 10) || 10;
+        this.nProcesses = parseInt(project.nProcesses, 10) || 10;
         this.logger = util.getProjectLogger(projectName);
         this.executor = new Executor();
         this.outputer = outputer;
-        this.project = {
-            name: projectName,
-            url: projectUrl,
-            percent: 0
-        };
         this.persistenceManager.addProject(this.project);
         this.commitsQueue = async.queue((commitBox, callback) => {
             const commit = commitBox.commit;
@@ -26,7 +28,7 @@ class ProjectAnaliser {
             commit._processing = true;
             commit._start = Date.now();
             const commitsFolder = `${resultPath}/${projectName}_commits`;
-            return processSingleCommit(this, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
+            return processSingleCommit(this, projectName, tasks, this.nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
                 this.logger.end(`process_${commitBox.commit.commit}`);
                 const percent = (_.filter(this.commits, '_processed').length / this.commits.length) * 100;
                 this.project.percent = percent;
@@ -40,8 +42,8 @@ class ProjectAnaliser {
                 commit._end = Date.now();
                 commit._processing = false;
             })
-        }, nProcesses);
-        this.analise = _.partial(this._analise, projectUrl, projectName, tasks, nProcesses, resultPath);
+        }, this.nProcesses);
+        this.analise = _.partial(this._analise, projectUrl, projectName, tasks, this.nProcesses, resultPath, this.commits);
     }
     storeProjectIfSafe(force) {
         if (!this._saveProjectPromise || force) {
@@ -52,17 +54,18 @@ class ProjectAnaliser {
         }
         return this._saveProjectPromise;
     }
-    _analise(projectUrl, projectName, tasks, nProcesses, resultPath) {
+    _analise(projectUrl, projectName, tasks, nProcesses, resultPath, commits) {
         return git.clone(projectUrl, projectName, resultPath)
-            .then(git.getCommitsAsJson.bind(git, resultPath, projectName))
+            .then(commits ? () => commits : git.getCommitsAsJson.bind(git, resultPath, projectName))
             .then(this.runTaskForEachCommit.bind(this, projectName, tasks, nProcesses, resultPath))
             .tap(commitsDone.bind(null, this))
             .then(() => this.commits.map(c => {
                 return _.omit(c, ['_pending', '_processed', '_processing', '_start', '_end']);
             })).tap(commits => {
+                this.project.completed = true;
                 this.storeProjectIfSafe(true);
                 this.logger.start('callOuputer');
-                return Promise.fromCallback(_.partial(this.outputer.export, projectName, resultPath, commits, util, this.logger)).tap(() => {
+                return Promise.fromCallback(_.partial(this.outputer, projectName, resultPath, commits, util, this.logger)).tap(() => {
                     this.logger.end('callOuputer');
                 });
             });
@@ -105,6 +108,7 @@ function needsMoreCommit(analiser) {
 }
 
 function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commitsFolder, commit, callback) {
+    if(commit._processed) return callback();
     const commitFolder = `${commitsFolder}/${commit.commit}`;
     return util.execPromise(`rm -Rf ${commitFolder}&&mkdir ${commitFolder}`)
         .finally(r => {
@@ -134,6 +138,23 @@ function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, c
 
 }
 
+const taskFlow = {
+    'string': (task) => {
+        const taskName = task.trim();
+        const isCommandLineTool = taskName.split(':').length > 1;
+        const [command, resultName] = taskName.split(':');
+        const taskRunner = isCommandLineTool ? require('../tasks/external-command.js').run.bind(null, command, resultName) : require(task.trim()).run;
+        return taskRunner;
+    },
+    'function': task => task,
+    'object': (task, methodName) => task[methodName]
+};
+
+function getTasks(tasks, methodName = 'run') {
+    if (_.isString(tasks)) tasks = tasks.split(',');
+    return tasks.map(task => taskFlow[typeof task](task, methodName));
+}
+
 class ProjectsAnaliser {
     constructor(projects, tasks, outputer, nProcesses, resultPath) {
         this.tasks = tasks;
@@ -144,7 +165,13 @@ class ProjectsAnaliser {
     }
     analise() {
         return Promise.fromCallback(async.forEachSeries.bind(null, this.projects, (project, cb) => {
-            new ProjectAnaliser(project.url, project.name, this.tasks, this.outputer, this.nProcesses, this.resultPath).analise().asCallback(cb);
+            Object.assign(project, {
+                tasks: this.tasks,
+                outputer: this.outputer,
+                nProcess: this.nProcesses,
+                resultPath: this.resultPath
+            });
+            new ProjectAnaliser(project).analise().asCallback(cb);
         }));
     }
 

@@ -5,10 +5,21 @@ const PersistenceManager = require('../model/index.js');
 const persistenceManager = new PersistenceManager('/tmp');
 const util = require('../lib/util.js');
 const logger = util.getLogger();
+async function restoreState(persistenceManager) {
+    const projectsName = await persistenceManager.findProjectsName();
+    projectsName.map(async project => {
+        const projectData = await persistenceManager.getProject(project.name);
+        console.log(projectData);
+        if (!projectData.completed) {
+            new ProjectAnaliser(projectData).analise();
+        }
+    })
+}
 async function init() {
     const config = await persistenceManager.loadConfig();
     console.log(config);
     persistenceManager.changeResultPath(config.resultPath || '/tmp');
+    restoreState(persistenceManager);
     const server = restify.createServer({
         name: 'commits-miner',
         version: '1.0.0'
@@ -58,21 +69,20 @@ async function init() {
         const url = req.body.url;
         const name = _.head(_.takeRight(url.split(/\.|\//), 2));
         const config = await persistenceManager.loadConfig();
-        const nProcess = config;
+        const nProcesses = config.nProcess;
         const resultPath = config.resultPath;
-        const tasks = config.tasks = config.tasks.split(',').map(task => {
-            const taskName = task.trim();
-            const isCommandLineTool = taskName.split(':').length > 1;
-            const [command, resultName] = taskName.split(':');
-            const taskRunner = isCommandLineTool ? require('../tasks/external-command.js').run.bind(null, command, resultName) : require(task.trim()).run;
-            return taskRunner;
-        });
+        const tasks = config.tasks;
         const outputer = require(config.outputer);
         const project = {
             name,
-            url
+            url,
+            tasks,
+            outputer,
+            nProcesses,
+            resultPath
         };
-        new ProjectAnaliser(project.url, project.name, tasks, outputer, config.nProcesses || 10, config.resultPath).analise().catch(console.error);
+        console.log(project);
+        new ProjectAnaliser(project).analise().catch(console.error);
         res.send({
             ok: true
         });

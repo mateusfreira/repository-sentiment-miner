@@ -35,7 +35,7 @@ class PersistenceManager {
                     name
                 };
             });
-        });
+        }).catch( ()=> []);
     }
 
     saveConfig(config) {

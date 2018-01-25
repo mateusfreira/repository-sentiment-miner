@@ -13,7 +13,14 @@ program
     .alias('ls')
     .description('this is test command')
     .action((gitUrl, resultPath, projectName, nProcesses) => {
-        new ProjectAnaliser(gitUrl, projectName, [require('../tasks/ls.js').run], require('../output/jsonFile.js'), nProcesses || 10, resultPath).analise().then(console.log);
+        new ProjectAnaliser({
+            url: gitUrl,
+            name: projectName,
+            tasks: [require('../tasks/ls.js').run],
+            outpute: require('../output/jsonFile.js'),
+            nProcesses: nProcesses || 10,
+            resultPath
+        }).analise().then(console.log);
     });
 
 program
@@ -22,7 +29,14 @@ program
     .description('execute a node file agains the script')
     .action((taskFile, gitUrl, resultPath, projectName, nProcesses, outputer) => {
         outputer = outputer || '../output/jsonFile.js';
-        new ProjectAnaliser(gitUrl, projectName, [require(taskFile).run], require(outputer), nProcesses || 10, resultPath).analise().then(() => console.log('finished'));
+        new ProjectAnaliser({
+            url: gitUrl,
+            name: projectName,
+            tasks: [require(taskFile).run],
+            outpute: require(outputer),
+            nProcesses: nProcesses || 10,
+            resultPath
+        }).analise().then(() => console.log('finished'));
     });
 program
     .command('execCommand <command> <resultName> <gitUrl> <resultPath> <projectName> [processes] [outputer]')
@@ -31,7 +45,14 @@ program
     .action((command, resultName, gitUrl, resultPath, projectName, nProcesses, outputer) => {
         const tasks = [require('../tasks/external-command.js').run.bind(null, command, resultName)];
         outputer = outputer || '../output/jsonFile.js';
-        new ProjectAnaliser(gitUrl, projectName, tasks, require(outputer), nProcesses || 10, resultPath).analise().then(() => console.log('finished'));
+        new ProjectAnaliser({
+            url: gitUrl,
+            name: projectName,
+            tasks,
+            outpute: require(outputer),
+            nProcesses: nProcesses || 10,
+            resultPath
+        }).analise().then(() => console.log('finished'));
     });
 
 program

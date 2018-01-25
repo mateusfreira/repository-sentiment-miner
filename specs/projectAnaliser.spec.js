@@ -14,7 +14,7 @@ describe('ProjectAnaliser', function() {
         });
         it('should run the command tasks for each commit', function() {
             const tasks = [
-                require('../tasks/external-command.js').run.bind(null, 'random-lang-command', 'command-result')
+                'random-lang-command:command-result'
             ];
             const outputer = {
                 export: () => {}
@@ -30,11 +30,52 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs(sinon.match(/random-lang-command/)).callsFake(() => Promise.resolve('{ "test": true  }'));
-            return new ProjectAnaliser('git://test.git', 'test', tasks, outputer, 1, '/tmp').analise().then(o => {
+            return new ProjectAnaliser({
+                url: 'git://test.git',
+                name: 'test',
+                tasks,
+                outputer,
+                nProcess: 1,
+                resultPath: '/tmp'
+            }).analise().then(o => {
                 expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
                 expect(_.first(o)).to.have.all.keys(['command-result', 'commit']);
             });
         });
+        it('should run the command tasks only for commits not processed commit', function() {
+            const tasks = [
+                'random-lang-command:command-result'
+            ];
+            const outputer = {
+                export: () => {}
+            };
+            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, util, logger, cb) => cb());
+            const commits = [{
+                commit: "982137897d897123df"
+            }, {
+                commit: "23423489234",
+                _processed: true
+            }];
+            mock.expects('execPromise').once().withArgs('cd  /tmp&&git clone git://test.git').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits&&mkdir /tmp/test_commits').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs(sinon.match(/random-lang-command/)).callsFake(() => Promise.resolve('{ "test": true  }'));
+            return new ProjectAnaliser({
+                url: 'git://test.git',
+                name: 'test',
+                tasks,
+                outputer,
+                commits,
+                nProcess: 1,
+                resultPath: '/tmp'
+            }).analise().then(o => {
+                expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
+                expect(_.first(o)).to.have.all.keys(['command-result', 'commit']);
+            });
+        });
+
         it('should run the tasks for each commit', function() {
             const tasks = [
                 (projectName, path, util, logger, a, c) => {
@@ -65,7 +106,14 @@ describe('ProjectAnaliser', function() {
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
             mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
-            return new ProjectAnaliser('git://test.git', 'test', tasks, outputer, 1, '/tmp').analise().then(o => {
+            return new ProjectAnaliser({
+                url: 'git://test.git',
+                name: 'test',
+                tasks,
+                outputer,
+                nProcess: 1,
+                resultPath: '/tmp'
+            }).analise().then(o => {
                 expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
                 expect(_.first(o)).to.have.all.keys('a', 'b', 'c', 'commit');
             });
