@@ -108,7 +108,7 @@ function needsMoreCommit(analiser) {
 }
 
 function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commitsFolder, commit, callback) {
-    if(commit._processed) return callback();
+    if (commit._processed) return callback();
     const commitFolder = `${commitsFolder}/${commit.commit}`;
     return util.execPromise(`rm -Rf ${commitFolder}&&mkdir ${commitFolder}`)
         .finally(r => {
@@ -132,7 +132,7 @@ function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, c
     const commitTasks = tasks.map(t => {
         return _.partial(t, projectName, commitBox.commitFolder, util, util.getProjectLogger(projectName));
     });
-    return self.executor.executeTasks(commitTasks, commitBox.commit).tap(() => {
+    return self.executor.executeTasks(commitTasks, commitBox.commit, self.project.retry, self.project.retryInterval).tap(() => {
         return util.execPromise(`rm -Rf ${commitBox.commitFolder}`);
     }).asCallback(callback);
 

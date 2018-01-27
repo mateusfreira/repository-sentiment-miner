@@ -2,9 +2,12 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const async = require('async');
 class Executor {
-    executeTasks(tasks, obj, callback) {
+    executeTasks(tasks, obj, retry, retryInterval) {
         return Promise.fromCallback(async.parallel.bind(null, tasks.map((task) => {
-            return _.partial(task, obj);
+            return async.retry.bind(null, {
+                times: retry || 3,
+                interval: retryInterval || 200
+            }, _.partial(task, obj));
         }))).then(r => obj);
     }
     executeAllTasks(tasks, objs) {

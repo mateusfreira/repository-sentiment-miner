@@ -69,7 +69,7 @@ async function init() {
         const url = req.body.url;
         const name = _.head(_.takeRight(url.split(/\.|\//), 2));
         const config = await persistenceManager.loadConfig();
-        const nProcesses = config.nProcess;
+        const nProcesses = config.nProcesses;
         const resultPath = config.resultPath;
         const tasks = config.tasks;
         const outputer = require(config.outputer);

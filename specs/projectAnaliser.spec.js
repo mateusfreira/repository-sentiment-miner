@@ -158,6 +158,83 @@ describe('ProjectAnaliser', function() {
                 expect(_.first(commits)).to.have.all.keys('a', 'b', 'c', 'commit');
             });
         });
-    });
 
+        it('should retry 3 times if the task failure', function() {
+            let nTry = 0;
+            const tasks = [
+                'random-lang-command:command-result',
+                (projectName, path, util, logger, commit, cb) => {
+                    expect(commit.commit).to.be.equal('982137897d897123df');
+                    nTry++;
+                    if (nTry === 3) {
+                        commit._worked = true;
+                        cb();
+                    } else {
+                        cb(new Error('Try again'));
+                    }
+                }
+            ];
+            const outputer = {
+                export: () => {}
+            };
+            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, util, logger, cb) => cb());
+            const commits = [{
+                commit: "982137897d897123df"
+            }];
+            mock.expects('execPromise').once().withArgs(sinon.match(/git log/)).callsFake(() => Promise.resolve('{  $$-$$commit$$-$$##$## $$-$$982137897d897123df$$-$$}'));
+            mock.expects('execPromise').once().withArgs('cd  /tmp&&git clone git://test.git').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits&&mkdir /tmp/test_commits').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs(sinon.match(/random-lang-command/)).callsFake(() => Promise.resolve('{ "test": true  }'));
+            return new ProjectAnaliser({
+                url: 'git://test.git',
+                name: 'test',
+                tasks,
+                outputer,
+                nProcess: 1,
+                resultPath: '/tmp'
+            }).analise().then(o => {
+                expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
+                expect(_.first(o)).to.have.all.keys(['command-result', 'commit', '_worked']);
+            });
+        });
+        it('should register the error on the commit if the task failure more than 3 times', function() {
+            const tasks = [
+                'random-lang-command:command-result',
+                (projectName, path, util, logger, commit, cb) => {
+                    expect(commit.commit).to.be.equal('982137897d897123df');
+                    cb(new Error('Try again'));
+                }
+            ];
+            const outputer = {
+                export: () => {}
+            };
+            sinon.stub(outputer, 'export').callsFake((projectName, path, commits, util, logger, cb) => cb());
+            const commits = [{
+                commit: "982137897d897123df"
+            }];
+            mock.expects('execPromise').once().withArgs(sinon.match(/git log/)).callsFake(() => Promise.resolve('{  $$-$$commit$$-$$##$## $$-$$982137897d897123df$$-$$}'));
+            mock.expects('execPromise').once().withArgs('cd  /tmp&&git clone git://test.git').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits&&mkdir /tmp/test_commits').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df&&mkdir /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('cd  /tmp/test&&git --work-tree=/tmp/test_commits/982137897d897123df checkout 982137897d897123df -- .').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs('rm -Rf /tmp/test_commits/982137897d897123df').callsFake(() => Promise.resolve());
+            mock.expects('execPromise').once().withArgs(sinon.match(/random-lang-command/)).callsFake(() => Promise.resolve('{ "test": true  }'));
+            return new ProjectAnaliser({
+                url: 'git://test.git',
+                name: 'test',
+                tasks,
+                outputer,
+                nProcess: 1,
+                resultPath: '/tmp'
+            }).analise().then(o => {
+                expect(outputer.export.calledWith('test', '/tmp', sinon.match.array, sinon.match.any)).to.be.equal(true);
+                const commit = _.first(o);
+                expect(commit).to.have.all.keys(['command-result', 'commit', '_error', '_errorMessage']);
+                expect(commit._errorMessage).to.be.equal('Try again');
+            });
+        });
+    });
 });

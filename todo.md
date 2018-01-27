@@ -10,7 +10,7 @@ Tasks
         [x] Add a coordinator do the commits processing
 		[x] Checkout n +1 commits while waiting for them to be processed
 	[x] Implement output options and extentions
-	[ ] Implement codesmells tasks
+	[x] Implement codesmells tasks
         [x] Callc code smells from the commit history
         [x] Indentify start and end of code smells
 	[x] Test
@@ -28,9 +28,10 @@ Tasks
     [x] Restore processing after failure
     [ ] Reduces data trafic of the commits check
     [ ] Pretty good citation https://dibt.unimol.it/staff/fpalomba/documents/C4.pdf
-    [ ] Find tool to check code metrics
+    [x] Find tool to check code metrics
     [x] Add a tool in Java for https://github.com/mauricioaniche/ck
     [ ] Add a start end filter on commits miner
     [ ] Add a timeou on the tasks
     [ ] Add feature to remove projects from list
     [ ] Compare with https://github.com/mauricioaniche/repodriller
+    [x] Add retry when task failure
