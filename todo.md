@@ -35,3 +35,8 @@ Tasks
     [ ] Add feature to remove projects from list
     [ ] Compare with https://github.com/mauricioaniche/repodriller
     [x] Add retry when task failure
+    [ ] Add retry and time to try as a configuratio
+    [ ] Add config to the task to choose the number of commits to process at the same time
+    [ ] Add config to the task if it need the Add retry and time to try as a configuratio
+    [ ] Add config to the task to choose the number of commits to process at the same time
+    [ ] Add config to the task if it need the commit folder to be externall
