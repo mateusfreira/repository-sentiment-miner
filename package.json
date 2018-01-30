@@ -1,6 +1,6 @@
 {
     "name": "commits-miner",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A tool for applying task on each commit of a project",
     "bin": "./command-line/index.js",
     "main": "index.js",
