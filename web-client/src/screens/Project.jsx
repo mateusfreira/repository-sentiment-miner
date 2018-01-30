@@ -32,7 +32,7 @@ class ProjectPage extends React.Component {
     const self = this;
     const updateProjectStatus = () => {
       axios
-        .get(`http://localhost:8080/project/${this.projectName}`)
+        .get(`http://localhost:8081/project/${this.projectName}`)
         .then(({ data }) => {
           const project = data;
           if (project.commits) {

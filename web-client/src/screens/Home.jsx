@@ -28,7 +28,7 @@ class ProjectTable extends Component {
   }
   componentDidMount() {
     axios
-      .get(`http://localhost:8080/list`)
+      .get(`http://localhost:8081/list`)
       .then(({ data }) => {
         data.forEach(_.partial(updateProjectState, _, data, this));
         this.setState({ projects: data });
@@ -105,7 +105,7 @@ class ProjectTable extends Component {
 
 function updateProjectState(project, projects, component) {
   axios
-    .get(`http://localhost:8080/project/status/${project.name}`)
+    .get(`http://localhost:8081/project/status/${project.name}`)
     .then(({ data }) => Object.assign(project, data))
     .then(() => component.setState({ projects }))
     .finally(() => {

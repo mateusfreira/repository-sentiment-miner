@@ -23,7 +23,7 @@ class ConfigForm extends Component {
   }
   componentDidMount() {
     axios
-      .get(`http://localhost:8080/config`)
+      .get(`http://localhost:8081/config`)
       .then(({ data }) => {
         this.setState({ ...data });
       })
@@ -42,7 +42,7 @@ class ConfigForm extends Component {
     event.preventDefault();
     const config = { ...this.state };
     axios
-      .post(`http://localhost:8080/config`, config)
+      .post(`http://localhost:8081/config`, config)
       .then(res => {
         swal('Saved!', 'Your configuration has been updated.', 'success');
       })
