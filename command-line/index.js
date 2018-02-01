@@ -4,6 +4,7 @@ const util = require('../lib/util.js');
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
 const ProjectsAnaliser = require('../service/projectAnaliser.js').ProjectsAnaliser;
 const program = require('commander');
+
 program
     .version('0.0.1')
     .description('Commits miner helper');

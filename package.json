@@ -1,46 +1,47 @@
 {
-    "name": "commits-miner",
-    "version": "0.0.2",
-    "description": "A tool for applying task on each commit of a project",
-    "bin": "./command-line/index.js",
-    "main": "index.js",
-    "directories": {
-        "lib": "lib"
-    },
-    "scripts": {
-        "test": "mocha specs/",
-        "server": "node server/index.js",
-        "server-pm2": "./node_modules/.bin/pm2 start server/index.js",
-        "client": "./node_modules/.bin/http-server ./web-client/build",
-        "postinstall": "cd ./web-client&&npm i&&npm run build"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/mateusfreira/commits-miner.git"
-    },
-    "author": "Mateus <mateus.freira@gmail.com>",
-    "license": "SEE LICENSE IN LICENSE",
-    "bugs": {
-        "url": "https://github.com/mateusfreira/commits-miner/issues"
-    },
-    "homepage": "https://github.com/mateusfreira/commits-miner#readme",
-    "dependencies": {
-        "async": "^2.6.0",
-        "big-json": "^2.0.0",
-        "bluebird": "^3.5.1",
-        "commander": "^2.13.0",
-        "http-server": "^0.11.1",
-        "leveldown": "^2.1.1",
-        "levelup": "^2.0.1",
-        "lodash": "^4.17.4",
-        "log4js": "^2.5.2",
-        "pm2": "^2.9.3",
-        "restify": "^6.3.4",
-        "should": "^13.2.1"
-    },
-    "devDependencies": {
-        "chai": "^4.1.2",
-        "mocha": "^4.1.0",
-        "sinon": "^4.2.2"
-    }
+  "name": "commits-miner",
+  "version": "0.0.2",
+  "description": "A tool for applying task on each commit of a project",
+  "bin": "./command-line/index.js",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "mocha specs/",
+    "server": "node server/index.js",
+    "server-pm2": "./node_modules/.bin/pm2 start server/index.js",
+    "client": "./node_modules/.bin/http-server ./web-client/build",
+    "postinstall": "cd ./web-client&&npm i&&npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateusfreira/commits-miner.git"
+  },
+  "author": "Mateus <mateus.freira@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/mateusfreira/commits-miner/issues"
+  },
+  "homepage": "https://github.com/mateusfreira/commits-miner#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "big-json": "^2.0.0",
+    "bluebird": "^3.5.1",
+    "commander": "^2.13.0",
+    "http-server": "^0.11.1",
+    "leveldown": "^2.1.1",
+    "levelup": "^2.0.1",
+    "lodash": "^4.17.4",
+    "log4js": "^2.5.2",
+    "pm2": "^2.9.3",
+    "restify": "^6.3.4",
+    "should": "^13.2.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.1.0",
+    "nock": "^9.1.6",
+    "sinon": "^4.2.2"
+  }
 }

@@ -1,6 +1,7 @@
 const sinon = require("sinon");
 const expect = require('chai');
 const util = require('../lib/util.js');
+
 describe('logProcess', function() {
     it('should log the process start', function() {
         const mock = sinon.mock(util.getLogger());
@@ -42,5 +43,4 @@ describe('getProjectLogger', function() {
         logger.start("test");
         logger.end("test");
     });
-
 });
