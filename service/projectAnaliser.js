@@ -25,7 +25,6 @@ class ProjectAnaliser {
         this.outputer = outputer;
         this.persistenceManager.addProject(this.project);
         this.commitsQueue = new Queue('commit', (commitBox) => {
-            console.log(commitBox);
             return processSingleCommit(this, projectName, tasks, this.nProcesses, resultPath, commitsFolder, commitBox).tap(() => {
                 const percent = (_.filter(this.commits, '_processed').length / this.commits.length) * 100;
                 this.project.percent = percent;
