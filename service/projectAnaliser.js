@@ -6,6 +6,7 @@ const PersistenceManager = require('../model');
 const Executor = require('../executor');
 const util = require('../lib/util.js');
 const logger = util.getLogger();
+const Queue = require('./queue.js').Queue;
 
 class ProjectAnaliser {
     constructor(project) {
@@ -14,6 +15,7 @@ class ProjectAnaliser {
         const tasks = getTasks(project.tasks);
         const outputer = _.first(getTasks([project.outputer], 'export'));
         const resultPath = project.resultPath;
+        const commitsFolder = `${resultPath}/${projectName}_commits`;
         this.commits = project.commits;
         this.project = project;
         this.persistenceManager = new PersistenceManager(resultPath);
@@ -22,27 +24,15 @@ class ProjectAnaliser {
         this.executor = new Executor();
         this.outputer = outputer;
         this.persistenceManager.addProject(this.project);
-        this.commitsQueue = async.queue((commitBox, callback) => {
-            const commit = commitBox.commit;
-            this.logger.start(`process_${commitBox.commit.commit}`);
-            commit._processing = true;
-            commit._start = Date.now();
-            const commitsFolder = `${resultPath}/${projectName}_commits`;
-            return processSingleCommit(this, projectName, tasks, this.nProcesses, resultPath, commitsFolder, commitBox, callback).tap(() => {
-                this.logger.end(`process_${commitBox.commit.commit}`);
+        this.commitsQueue = new Queue('commit', (commitBox) => {
+            console.log(commitBox);
+            return processSingleCommit(this, projectName, tasks, this.nProcesses, resultPath, commitsFolder, commitBox).tap(() => {
                 const percent = (_.filter(this.commits, '_processed').length / this.commits.length) * 100;
                 this.project.percent = percent;
                 this.logger.log(`processed ${percent}% of the commits`);
                 this.storeProjectIfSafe();
-            }).catch((e) => {
-                commitBox.commit._error = true;
-                commitBox.commit._errorMessage = e.message;
-                throw e;
-            }).finally(() => {
-                commit._end = Date.now();
-                commit._processing = false;
             })
-        }, this.nProcesses);
+        }, 'commit', 'commit', this.nProcesses, this.logger);
         this.analise = _.partial(this._analise, projectUrl, projectName, tasks, this.nProcesses, resultPath, this.commits);
     }
     storeProjectIfSafe(force) {
@@ -112,7 +102,7 @@ function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commits
     const commitFolder = `${commitsFolder}/${commit.commit}`;
     return util.execPromise(`rm -Rf ${commitFolder}&&mkdir ${commitFolder}`)
         .finally(r => {
-            return git.checkoutCommitToFolder(resultPath, projectName, commit.commit, commitFolder)
+            return git.checkoutCommitToFolder(resultPath, projectName, commit.commit, commitFolder);
         })
         .then((c) => {
             const commitBox = {
@@ -120,7 +110,7 @@ function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commits
                 commitFolder
             };
             commit._pending = true;
-            self.commitsQueue.push(commitBox, () => {
+            self.commitsQueue.push(commitBox).finally(() => {
                 self.logger.log(`finished processing ${commitBox.commit.commit}`)
                 commit._pending = false;
                 commit._processed = true;
@@ -128,14 +118,13 @@ function prepareCommit(self, projectName, tasks, nProcesses, resultPath, commits
         }).tap(_.partial(needsMoreCommit, self)).asCallback(callback);
 }
 
-function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox, callback) {
+function processSingleCommit(self, projectName, tasks, nProcesses, resultPath, commitsFolder, commitBox) {
     const commitTasks = tasks.map(t => {
         return _.partial(t, projectName, commitBox.commitFolder, util, util.getProjectLogger(projectName));
     });
     return self.executor.executeTasks(commitTasks, commitBox.commit, self.project.retry, self.project.retryInterval).tap(() => {
         return util.execPromise(`rm -Rf ${commitBox.commitFolder}`);
-    }).asCallback(callback);
-
+    });
 }
 
 const taskFlow = {
