@@ -3,7 +3,7 @@ import axios from 'axios';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
 import container from '../components/Container.jsx';
-
+import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -12,6 +12,7 @@ import TextField from 'material-ui/TextField';
 class ConfigForm extends Component {
   constructor(props) {
     super(props);
+    this.service = new CommitMiner(window.location.hostname);
     this.state = {
       resultPath: '/tmp',
       nProcesses: 3,
@@ -22,10 +23,12 @@ class ConfigForm extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
   componentDidMount() {
-    axios
-      .get(`http://localhost:8081/config`)
+    this.service
+      .getConfiguration()
       .then(({ data }) => {
-        this.setState({ ...data });
+        this.setState({
+          ...data
+        });
       })
       .catch(err => {
         swal(
@@ -41,8 +44,8 @@ class ConfigForm extends Component {
   handleSubmit(event) {
     event.preventDefault();
     const config = { ...this.state };
-    axios
-      .post(`http://localhost:8081/config`, config)
+    this.service
+      .updateConfig(config)
       .then(res => {
         swal('Saved!', 'Your configuration has been updated.', 'success');
       })
@@ -50,6 +53,7 @@ class ConfigForm extends Component {
         swal('Ops...', `Check if commits miner is running correctly.`, 'error');
       });
   }
+
   renderInputs() {
     const inputs = [
       {

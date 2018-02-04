@@ -3,7 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
-
+import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import {
   Table,
@@ -18,20 +18,42 @@ import FlatButton from 'material-ui/FlatButton';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import GridCard from '../components/GridCard.jsx';
 
+function updateProjectState(project, projects, component) {
+  component.service
+    .getProjectStatus(project)
+    .then(({ data }) => Object.assign(project, data))
+    .then(() =>
+      component.setState({
+        projects
+      })
+    )
+    .finally(() => {
+      if (project.percent !== 100) {
+        setTimeout(
+          updateProjectState.bind(null, project, projects, component),
+          3000
+        );
+      }
+    });
+}
+
 class ProjectTable extends Component {
   constructor(props) {
     super(props);
+    this.service = new CommitMiner(window.location.hostname);
     this.classes = props.classes;
     this.state = {
       projects: []
     };
   }
   componentDidMount() {
-    axios
-      .get(`http://localhost:8081/list`)
+    this.service
+      .getProjectList()
       .then(({ data }) => {
         data.forEach(_.partial(updateProjectState, _, data, this));
-        this.setState({ projects: data });
+        this.setState({
+          projects: data
+        });
       })
       .catch(err => {
         swal(
@@ -41,6 +63,7 @@ class ProjectTable extends Component {
         );
       });
   }
+
   loadProject(rowNum) {
     const name = this.state.projects[rowNum].name;
     this.props.history.push(`/project/${name}`);
@@ -101,21 +124,6 @@ class ProjectTable extends Component {
       </GridCard>
     );
   }
-}
-
-function updateProjectState(project, projects, component) {
-  axios
-    .get(`http://localhost:8081/project/status/${project.name}`)
-    .then(({ data }) => Object.assign(project, data))
-    .then(() => component.setState({ projects }))
-    .finally(() => {
-      if (project.percent !== 100) {
-        setTimeout(
-          updateProjectState.bind(null, project, projects, component),
-          3000
-        );
-      }
-    });
 }
 
 const ClickableRow = styled(TableRow)`
