@@ -3,7 +3,7 @@ import axios from 'axios';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
 import container from '../components/Container.jsx';
-
+import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -12,6 +12,7 @@ import TextField from 'material-ui/TextField';
 class AddProject extends React.Component {
   constructor(props) {
     super(props);
+    this.service = new CommitMiner(window.location.hostname);
     this.state = {
       url: ''
     };
@@ -22,8 +23,8 @@ class AddProject extends React.Component {
     this.setState({ [name]: value });
   }
   handleSubmit(event) {
-    axios
-      .post(`http://localhost:8081/start`, { url: this.state.url })
+    this.service
+      .startProject(this.state.url)
       .then(res => {
         swal('Saved!', 'Your project has been added.', 'success');
       })

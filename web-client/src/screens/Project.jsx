@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import axios from 'axios';
-
+import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import {
   Table,
@@ -18,6 +18,7 @@ import Snackbar from 'material-ui/Snackbar';
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
+    this.service = new CommitMiner(window.location.hostname);
     this.classes = props.classes;
     this.projectName = props.match.params.projectId;
     this.state = {
@@ -31,19 +32,17 @@ class ProjectPage extends React.Component {
   componentDidMount() {
     const self = this;
     const updateProjectStatus = () => {
-      axios
-        .get(`http://localhost:8081/project/${this.projectName}`)
-        .then(({ data }) => {
-          const project = data;
-          if (project.commits) {
-            this.setState({
-              project
-            });
-            if (_.some(project.commits, '_pending') && self.state.update) {
-              setTimeout(updateProjectStatus, 1000);
-            }
+      this.service.getProjectState(this.projectName).then(({ data }) => {
+        const project = data;
+        if (project.commits) {
+          this.setState({
+            project
+          });
+          if (_.some(project.commits, '_pending') && self.state.update) {
+            setTimeout(updateProjectStatus, 1000);
           }
-        });
+        }
+      });
     };
     updateProjectStatus();
     this.setState({
