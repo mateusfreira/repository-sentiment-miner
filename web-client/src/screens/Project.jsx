@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React from 'react';
-import axios from 'axios';
 import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import {
