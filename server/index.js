@@ -1,9 +1,14 @@
 const restify = require('restify');
 const _ = require('lodash');
+const {
+    importProject
+} = require('../service/sentiment/ProjectImport.js');
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
 const PersistenceManager = require('../model/index.js');
 const persistenceManager = new PersistenceManager('/tmp');
 const util = require('../lib/util.js');
+const models = require('../model/mongo/index.js');
+const PullComments = models.PullComments;
 const logger = util.getLogger();
 async function restoreState(persistenceManager) {
     const projectsName = await persistenceManager.findProjectsName();
@@ -64,6 +69,15 @@ async function init() {
         });
     });
 
+    server.get('/import/:owner/:repo', async function(req, res, next) {
+        console.log('receive start request...');
+        const projectName = req.params.owner + "/" + req.params.repo;
+        await importProject(projectName).then(project => {
+            res.send(project);
+            next();
+        }, next);
+    });
+
     server.post('/start', async function(req, res, next) {
         console.log('receive start request...');
         const url = req.body.url;
@@ -115,6 +129,35 @@ async function init() {
         }).catch(e => {
             logger.error('API', e);
             res.send(404, 'project not found')
+        })
+    });
+
+    server.get('/reports/weekday', function(req, res, next) {
+        return PullComments.aggregate(
+            [
+                /*{$match: {
+                    _project: ObjectId("5a082dad445883b25fd1b24a")
+                },*/
+
+                {
+                    $group: {
+                        _id: {
+                            $dayOfWeek: "$created_at"
+                        },
+                        sum: {
+                            $sum: "$sentistrength_new.wholeText.whole_text.scale"
+                        },
+                        count: {
+                            $sum: 1
+                        },
+                    }
+                }
+            ]).exec().then(r => {
+            res.send(r);
+            next();
+        }).catch(e => {
+            logger.error('API', e);
+            res.send(404, 'not found');
         })
     });
 

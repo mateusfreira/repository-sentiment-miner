@@ -29,9 +29,11 @@
     "big-json": "^2.0.0",
     "bluebird": "^3.5.1",
     "commander": "^2.13.0",
+    "config": "^1.30.0",
     "http-server": "^0.11.1",
     "lodash": "^4.17.4",
     "log4js": "^2.5.2",
+    "mongoose": "^5.0.12",
     "pm2": "^2.9.3",
     "restify": "^6.3.4",
     "should": "^13.2.1"
