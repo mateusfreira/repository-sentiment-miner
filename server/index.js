@@ -3,6 +3,11 @@ const _ = require('lodash');
 const {
     importProject
 } = require('../service/sentiment/ProjectImport.js');
+const {
+    dayOfWeekSentiment,
+    sentimentByType
+} = require('../service/sentiment/Reports.js');
+
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
 const PersistenceManager = require('../model/index.js');
 const persistenceManager = new PersistenceManager('/tmp');
@@ -132,27 +137,17 @@ async function init() {
         })
     });
 
+    server.get('/reports/sentimentByType', function(req, res, next) {
+        return sentimentByType().then(r => {
+            res.send(r);
+            next();
+        }).catch(e => {
+            logger.error('API', e);
+            res.send(404, 'not found');
+        })
+    });
     server.get('/reports/weekday', function(req, res, next) {
-        return PullComments.aggregate(
-            [
-                /*{$match: {
-                    _project: ObjectId("5a082dad445883b25fd1b24a")
-                },*/
-
-                {
-                    $group: {
-                        _id: {
-                            $dayOfWeek: "$created_at"
-                        },
-                        sum: {
-                            $sum: "$sentistrength_new.wholeText.whole_text.scale"
-                        },
-                        count: {
-                            $sum: 1
-                        },
-                    }
-                }
-            ]).exec().then(r => {
+        return dayOfWeekSentiment().then(r => {
             res.send(r);
             next();
         }).catch(e => {

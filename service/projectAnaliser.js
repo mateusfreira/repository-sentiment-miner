@@ -151,6 +151,7 @@ class ProjectsAnaliser {
         this.projects = projects;
         this.resultPath = resultPath;
     }
+
     analise() {
         return Promise.fromCallback(async.forEachSeries.bind(null, this.projects, (project, cb) => {
             Object.assign(project, {
