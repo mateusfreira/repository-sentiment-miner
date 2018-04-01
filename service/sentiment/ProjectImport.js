@@ -19,7 +19,7 @@ const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, fi
         interaction.offencive = isOffencive(interaction.body || interaction.message || '');
     });
     cp();
-}, (data, field, cp, grouped) => {
+}, (data, field, cp, grouped, project) => {
     data.forEach(i => i.created_at = new Date(i.created_at))
     cp();
 }];
@@ -44,7 +44,6 @@ function applySentiment(data) {
     return new Promise((resolve, reject) => {
         let finished = 0;
         const chunks_size = 100;
-        console.log(chunks_size);
         const chunks = _.chunk(data, chunks_size);
         const nPoocesses = 9;
         async.eachLimit(chunks, nPoocesses, function(obj, callback) {
@@ -66,18 +65,20 @@ function importProject(projectUrl) {
     return gitHubUtil
         .getData(`https://api.github.com/repos/${projectUrl}`, ['pulls_url', 'commits_url'])
         .then((project) => {
+            const mongoProject = new Project(project);
             return Promise.map(project._pulls, (pull) => {
                 return Promise.all([
                     gitHubUtil.getData(pull.comments_url),
                     gitHubUtil.getData(pull.review_comments_url),
                     gitHubUtil.getData(pull.commits_url).then(commits => commits.map(c => {
-                        c.body = c.message;
+                        c.body = _.get(c, 'commit.message');
                         return c;
                     })),
                     gitHubUtil.getData(pull.comments_url.replace('comments', 'events'))
                 ]).spread((_comments, _reviews, _commits, _events) => {
                     const interactions = _.flatten([pull, _comments, _reviews, _commits, _events]);
-                    return applySentiment(interactions).then(() => Promise.map(interactions, interaction => {
+                    return applySentiment(interactions, mongoProject).then(() => Promise.map(interactions, interaction => {
+                        interaction._project = mongoProject._id;
                         return checkDeveloper(interaction);
                     }).then(() => {
                         delete pull._commits;
@@ -88,7 +89,7 @@ function importProject(projectUrl) {
                         return Promise.all([
                             pullMongo.save(),
                             Promise.all(_comments.map(c => {
-                                c._pull = pull._id;
+                                c._pull = pullMongo._id;
                                 return new PullComments(c).save();
                             })),
                             Promise.all(_reviews.map(c => {
@@ -108,11 +109,16 @@ function importProject(projectUrl) {
             }).then((pulls) => {
                 return project;
             }).then(function(project) {
-                return Promise.all(project._commits.map(c => new Commit(c).save())).then(() => project);
+                return applySentiment(project._commits, mongoProject)
+                    .then(commits => commits.map(c => {
+                        c._project = mongoProject._id;
+                        return new Commit(c).save();
+                    }))
+                    .then(() => project);
             }).then(function(project) {
-                delete project._commits;
-                delete project._pulls;
-                return new Project(project).save();
+                mongoProject.set('_commits', undefined);
+                mongoProject.set('_pulls', undefined);
+                return mongoProject.save();
             });
         }).then(project => {
             console.log(project.full_name);

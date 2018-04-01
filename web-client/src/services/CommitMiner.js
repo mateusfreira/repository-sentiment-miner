@@ -34,11 +34,21 @@ class CommitMiner {
   }
 
   getInteractionsReport(project) {
-    return axios.get(`http://${this.domain}:8081/reports/sentimentByType`);
+    return axios.get(
+      `http://${this.domain}:8081/reports/sentimentByType?_project=${project}`
+    );
   }
 
   getWeekDayeReport(project) {
-    return axios.get(`http://${this.domain}:8081/reports/weekday`);
+    return axios.get(
+      `http://${this.domain}:8081/reports/weekday?_project=${project}`
+    );
+  }
+
+  getWrostAndBest(project) {
+    return axios.get(
+      `http://${this.domain}:8081/reports/worstAndTheBest?_project=${project}`
+    );
   }
 }
 export default CommitMiner;

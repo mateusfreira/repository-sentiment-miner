@@ -7,6 +7,7 @@ const Project = models.Project;
 const PullComments = models.PullComments;
 const PullReviews = models.PullReviews;
 const Commit = models.Commit;
+const _ = require('lodash');
 
 const neutralFilter = {
     "sentistrength_new.wholeText.whole_text.scale": {
@@ -25,10 +26,11 @@ const positiveFilter = {
     }
 };
 
-function dayOfWeekSentiment(filter = {}) {
+function dayOfWeekSentiment($match = {}) {
+    console.log($match)
     return PullComments.aggregate(
         [{
-                $match: filter,
+                $match: _.clone($match),
             },
             {
                 $group: {
@@ -57,15 +59,11 @@ function countSentimentByEntity(model, filter) {
 class Reports {
 
     dayOfWeekSentiment(filter = {}) {
-        return Promise.all([
-            dayOfWeekSentiment(Object.assign(filter, positiveFilter)), 
-            dayOfWeekSentiment(Object.assign(filter, neutralFilter)),
-            dayOfWeekSentiment(Object.assign(filter, negativeFilter))
-        ]).spread((positive, neutral, nevative) => Object.assign({}, {
-            positive,
-            neutral,
-            nevative
-        }));
+        return Promise.props({
+            positive: dayOfWeekSentiment(Object.assign(filter, positiveFilter)),
+            neutral: dayOfWeekSentiment(Object.assign(filter, neutralFilter)),
+            negative: dayOfWeekSentiment(Object.assign(filter, negativeFilter))
+        });
     }
 
     sentimentByType(filter = {}) {
@@ -74,6 +72,24 @@ class Reports {
             comments: countSentimentByEntity(PullComments, filter),
             reviews: countSentimentByEntity(PullReviews, filter),
             commits: countSentimentByEntity(Commit, filter)
+        });
+    }
+
+    worstAndTheBest(filter = {}, limit = 5) {
+        return Promise.props({
+            worst: PullComments.find(filter)
+                .limit(limit)
+                .sort({
+                    "sentistrength_new.wholeText.whole_text.scale": 1,
+                    "sentistrength_new.wholeText.whole_text.negative": 1,
+
+                }),
+            bests: PullComments.find(filter)
+                .limit(limit)
+                .sort({
+                    "sentistrength_new.wholeText.whole_text.scale": -1,
+                    "sentistrength_new.wholeText.whole_text.positive": -1,
+                })
         });
     }
 }

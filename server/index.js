@@ -5,7 +5,8 @@ const {
 } = require('../service/sentiment/ProjectImport.js');
 const {
     dayOfWeekSentiment,
-    sentimentByType
+    sentimentByType,
+    worstAndTheBest
 } = require('../service/sentiment/Reports.js');
 
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
@@ -16,6 +17,9 @@ const models = require('../model/mongo/index.js');
 const Project = models.Project;
 const PullComments = models.PullComments;
 const logger = util.getLogger();
+const {
+    ObjectId
+} = require('mongoose').Types.ObjectId;
 async function restoreState(persistenceManager) {
     const projectsName = await persistenceManager.findProjectsName();
     projectsName.map(async project => {
@@ -78,10 +82,12 @@ async function init() {
     server.get('/import/:owner/:repo', async function(req, res, next) {
         console.log('receive start request...');
         const projectName = req.params.owner + "/" + req.params.repo;
-        await importProject(projectName).then(project => {
-            res.send(project);
-            next();
-        }, next);
+        res.send({
+            ok: true
+        });
+        next();
+        const project = await importProject(projectName);
+        console.log(`Project ${project.name}`);
     });
 
     server.post('/start', async function(req, res, next) {
@@ -118,9 +124,11 @@ async function init() {
         });
     });
 
-    server.get('/project/:name', function(req, res, next) {
-        persistenceManager.getProject(req.params.name).then(projects => {
-            res.send(projects);
+    server.get('/project/:id', function(req, res, next) {
+        Project.findOne({
+            _id: req.params.id
+        }).then(project => {
+            res.send(project);
             next();
         }).catch(e => {
             res.send(404, 'project not found')
@@ -141,7 +149,10 @@ async function init() {
     });
 
     server.get('/reports/sentimentByType', function(req, res, next) {
-        return sentimentByType().then(r => {
+        const query = req.query;
+        return sentimentByType({
+            _project: ObjectId(query._project)
+        }).then(r => {
             res.send(r);
             next();
         }).catch(e => {
@@ -149,15 +160,29 @@ async function init() {
             res.send(404, 'not found');
         })
     });
-
-    server.get('/reports/weekday', function(req, res, next) {
-        return dayOfWeekSentiment().then(r => {
+    server.get('/reports/worstAndTheBest', function(req, res, next) {
+        return worstAndTheBest({
+            _project: ObjectId(req.query._project)
+        }).then(r => {
             res.send(r);
             next();
         }).catch(e => {
             logger.error('API', e);
             res.send(404, 'not found');
-        })
+        });
+    });
+
+
+    server.get('/reports/weekday', function(req, res, next) {
+        return dayOfWeekSentiment({
+            _project: ObjectId(req.query._project)
+        }).then(r => {
+            res.send(r);
+            next();
+        }).catch(e => {
+            logger.error('API', e);
+            res.send(404, 'not found');
+        });
     });
 
 

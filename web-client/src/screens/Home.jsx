@@ -26,15 +26,7 @@ function updateProjectState(project, projects, component) {
       component.setState({
         projects
       })
-    )
-    .finally(() => {
-      if (project.percent !== 100) {
-        setTimeout(
-          updateProjectState.bind(null, project, projects, component),
-          3000
-        );
-      }
-    });
+    );
 }
 
 class ProjectTable extends Component {
@@ -65,7 +57,7 @@ class ProjectTable extends Component {
   }
 
   loadProject(rowNum) {
-    const name = this.state.projects[rowNum].name;
+    const name = this.state.projects[rowNum]._id;
     this.props.history.push(`/project/${name}`);
   }
   changePage(name) {
