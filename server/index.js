@@ -13,6 +13,7 @@ const PersistenceManager = require('../model/index.js');
 const persistenceManager = new PersistenceManager('/tmp');
 const util = require('../lib/util.js');
 const models = require('../model/mongo/index.js');
+const Project = models.Project;
 const PullComments = models.PullComments;
 const logger = util.getLogger();
 async function restoreState(persistenceManager) {
@@ -107,9 +108,11 @@ async function init() {
         });
         next();
     });
+
     server.get('/list', function(req, res, next) {
         console.log('receive list request...');
-        persistenceManager.findProjectsName().then(projects => {
+        // persistenceManager.findProjectsName()
+        Project.find().then(projects => {
             res.send(projects);
             next();
         });
@@ -146,6 +149,7 @@ async function init() {
             res.send(404, 'not found');
         })
     });
+
     server.get('/reports/weekday', function(req, res, next) {
         return dayOfWeekSentiment().then(r => {
             res.send(r);
@@ -161,4 +165,5 @@ async function init() {
         console.log('%s listening at %s', server.name, server.url);
     });
 }
+
 init();

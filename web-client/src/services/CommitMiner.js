@@ -32,5 +32,13 @@ class CommitMiner {
       `http://${this.domain}:8081/project/status/${project.name}`
     );
   }
+
+  getInteractionsReport(project) {
+    return axios.get(`http://${this.domain}:8081/reports/sentimentByType`);
+  }
+
+  getWeekDayeReport(project) {
+    return axios.get(`http://${this.domain}:8081/reports/weekday`);
+  }
 }
 export default CommitMiner;

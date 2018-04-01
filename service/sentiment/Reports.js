@@ -58,9 +58,12 @@ class Reports {
 
     dayOfWeekSentiment(filter = {}) {
         return Promise.all([
-            dayOfWeekSentiment(Object.assign(filter, positiveFilter)), dayOfWeekSentiment(Object.assign(filter, negativeFilter))
-        ]).spread((positive, nevative) => Object.assign({}, {
+            dayOfWeekSentiment(Object.assign(filter, positiveFilter)), 
+            dayOfWeekSentiment(Object.assign(filter, neutralFilter)),
+            dayOfWeekSentiment(Object.assign(filter, negativeFilter))
+        ]).spread((positive, neutral, nevative) => Object.assign({}, {
             positive,
+            neutral,
             nevative
         }));
     }
