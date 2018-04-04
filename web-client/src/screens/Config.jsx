@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
 import container from '../components/Container.jsx';
