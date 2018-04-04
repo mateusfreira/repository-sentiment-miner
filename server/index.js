@@ -6,7 +6,9 @@ const {
 const {
     dayOfWeekSentiment,
     sentimentByType,
-    worstAndTheBest
+    worstAndTheBest,
+    mostSentimental,
+    onceContributors
 } = require('../service/sentiment/Reports.js');
 
 const ProjectAnaliser = require('../service/projectAnaliser.js').ProjectAnaliser;
@@ -20,6 +22,10 @@ const logger = util.getLogger();
 const {
     ObjectId
 } = require('mongoose').Types.ObjectId;
+const {
+    processDevelopersProfile
+} = require('../service/sentiment/DeveloperProcess.js');
+
 async function restoreState(persistenceManager) {
     const projectsName = await persistenceManager.findProjectsName();
     projectsName.map(async project => {
@@ -180,7 +186,39 @@ async function init() {
             res.send(r);
             next();
         }).catch(e => {
-            logger.error('API', e);
+            logger.error('api', e);
+            res.send(404, 'not found');
+        });
+    });
+
+    server.get('/process/developers', function(req, res, next) {
+        processDevelopersProfile({
+            _project: ObjectId(req.query._project)
+        });
+        res.send({
+            ok: true
+        });
+        next();
+    });
+
+    server.get('/reports/once-contributors', function(req, res, next) {
+        onceContributors(req.query._project).then((report) => {
+            res.send(report);
+            next();
+        }).catch(e => {
+            logger.error('api', e);
+            res.send(404, 'not found');
+        });
+    });
+
+    server.get('/reports/most-sentimental', function(req, res, next) {
+        mostSentimental({
+            'contribuitions.projects': req.query._project
+        }).then((report) => {
+            res.send(report);
+            next();
+        }).catch(e => {
+            logger.error('api', e);
             res.send(404, 'not found');
         });
     });

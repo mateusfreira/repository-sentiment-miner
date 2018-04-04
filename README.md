@@ -50,3 +50,9 @@ your-command project_name commit_dir commit_info_in_json
 
 # Needs help? 
 Ping me on chat [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
+
+
+
+
+
+

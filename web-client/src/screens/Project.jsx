@@ -16,14 +16,20 @@ import CircularProgress from 'material-ui/CircularProgress';
 import GridCard from '../components/GridCard.jsx';
 import Snackbar from 'material-ui/Snackbar';
 
-function getPieChartData(data) {
+function getPieChartData(
+  data,
+  labels = ['Positive', 'Neutral', 'Negative'],
+  backgroundColor = ['green', 'gray', 'red']
+) {
   return {
-    labels: ['Positive', 'Neutral', 'Negative'],
+    labels,
     datasets: [
       {
-        data: [data.positive, data.neutral, data.negative],
-        backgroundColor: ['green', 'gray', 'red'],
-        hoverBackgroundColor: ['green', 'gray', 'red']
+        data: !_.isArray(data)
+          ? [data.positive, data.neutral, data.negative]
+          : data,
+        backgroundColor,
+        hoverBackgroundColor: backgroundColor
       }
     ]
   };
@@ -127,7 +133,9 @@ class ProjectPage extends React.Component {
     this.projectName = props.match.params.projectId;
     this.state = {
       worst: [],
+      sentimentals: [],
       bests: [],
+      onceContributors: {},
       project: {
         commits: []
       },
@@ -137,6 +145,7 @@ class ProjectPage extends React.Component {
 
     this.handleRequestClose = this.handleRequestClose.bind(this);
   }
+
   componentDidMount() {
     const self = this;
     const updateProjectStatus = () => {
@@ -161,6 +170,18 @@ class ProjectPage extends React.Component {
       this.service.getProjectState(this.projectName).then(({ data }) => {
         this.setState({
           project: data
+        });
+      });
+
+      this.service.getMostSentimental(this.projectName).then(({ data }) => {
+        this.setState({
+          sentimentals: data
+        });
+      });
+
+      this.service.getOnceContributors(this.projectName).then(({ data }) => {
+        this.setState({
+          onceContributors: data
         });
       });
     };
@@ -205,7 +226,14 @@ class ProjectPage extends React.Component {
             <Line data={this.state.lineChartData} />
           </span>
         </div>
-        <div style={{ border: '1px solid gray', width: '33%', float: 'left' }}>
+        <div
+          style={{
+            'border-rigth': '1px solid gray',
+            'border-bottom': '1px solid gray',
+            width: '33%',
+            float: 'left'
+          }}
+        >
           <Table>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
               <TableRow>
@@ -221,11 +249,18 @@ class ProjectPage extends React.Component {
             </TableBody>
           </Table>
         </div>
-        <div style={{ border: '1px solid gray', width: '33%', float: 'left' }}>
+        <div
+          style={{
+            'border-left': '1px solid gray',
+            'border-bottom': '1px solid gray',
+            width: '33%',
+            float: 'left'
+          }}
+        >
           <Table>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
               <TableRow>
-                <TableHeaderColumn>Most negative comments</TableHeaderColumn>
+                <TableHeaderColumn>Most positive comments</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
@@ -236,6 +271,69 @@ class ProjectPage extends React.Component {
               ))}
             </TableBody>
           </Table>
+        </div>
+        <div
+          style={{
+            'border-rigth': '1px solid gray',
+            width: '49%',
+            float: 'left'
+          }}
+        >
+          <Table>
+            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+              <TableRow>
+                <TableHeaderColumn>
+                  Most sentimental developers
+                </TableHeaderColumn>
+                <TableHeaderColumn>Sentiment distribution</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false} showRowHover={true}>
+              {this.state.sentimentals.map((developer, idx) => (
+                <TableRow key={idx}>
+                  <TableRowColumn style={{ width: '30%' }}>
+                    {developer.value.login}
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Pie
+                      data={getPieChartData({
+                        positive:
+                          developer.contribuitions.comments.sentiment.geral
+                            .positive || 0,
+                        neutral:
+                          developer.contribuitions.comments.sentiment.geral
+                            .neutral || 0,
+                        negative:
+                          developer.contribuitions.comments.sentiment.geral
+                            .negative || 0
+                      })}
+                      redraw={true}
+                    />
+                  </TableRowColumn>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div
+          style={{
+            'border-left': '1px solid gray',
+            width: '49%',
+            float: 'left'
+          }}
+        >
+          <h2> Contributors </h2>
+          <Pie
+            data={getPieChartData(
+              [
+                this.state.onceContributors.once,
+                this.state.onceContributors.moreThanOnce
+              ],
+              ['Once', 'More than once'],
+              ['gray', 'green']
+            )}
+            redraw={true}
+          />
         </div>
       </span>
     );

@@ -19,9 +19,11 @@ class AddProject extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+
   handleInputChange(name, value) {
     this.setState({ [name]: value });
   }
+
   handleSubmit(event) {
     this.service
       .startProject(this.state.url)

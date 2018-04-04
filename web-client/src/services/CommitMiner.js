@@ -14,7 +14,7 @@ class CommitMiner {
   }
 
   startProject(url) {
-    return axios.post(`http://${this.domain}:8081/start`, {
+    return axios.get(`http://${this.domain}:8081/import/${url}`, {
       url: url
     });
   }
@@ -48,6 +48,18 @@ class CommitMiner {
   getWrostAndBest(project) {
     return axios.get(
       `http://${this.domain}:8081/reports/worstAndTheBest?_project=${project}`
+    );
+  }
+
+  getMostSentimental(project) {
+    return axios.get(
+      `http://${this.domain}:8081/reports/most-sentimental?_project=${project}`
+    );
+  }
+
+  getOnceContributors(project) {
+    return axios.get(
+      `http://${this.domain}:8081/reports/once-contributors?_project=${project}`
     );
   }
 }

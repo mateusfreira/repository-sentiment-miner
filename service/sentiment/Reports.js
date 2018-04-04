@@ -92,6 +92,29 @@ class Reports {
                 })
         });
     }
+
+    mostSentimental(filter = {}, limit = 5) {
+        return Developer.find(filter)
+            .limit(limit)
+            .sort({
+                "contribuitions.sentimentsClass": -1
+            });
+    }
+
+    onceContributors(project) {
+        return Promise.props({
+            once: Developer.count({
+                [`contribuitions.pulls.byProject.data.${project}`]: {
+                    $eq: 1
+                }
+            }),
+            moreThanOnce: Developer.count({
+                [`contribuitions.pulls.byProject.data.${project}`]: {
+                    $gt: 1
+                }
+            }),
+        });
+    }
 }
 
 module.exports = new Reports();
