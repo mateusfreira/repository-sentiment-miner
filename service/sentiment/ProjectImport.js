@@ -24,10 +24,15 @@ const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, fi
     cp();
 }];
 
+const pendingCheckDeveloper = {
+
+};
+
 function checkDeveloper(interaction) {
     const value = _.get(interaction, 'user', _.get(interaction, 'author'));
     const id = _.get(value, 'login');
-    return Developer.count({
+    if (!id) return Promise.resolve();
+    const checkPromise = pendingCheckDeveloper[id] || Developer.count({
         "value.login": id
     }).then(n => {
         if (n === 0 && id) {
@@ -37,8 +42,11 @@ function checkDeveloper(interaction) {
                 value
             }).save();
         }
-    })
+    });
+    pendingCheckDeveloper[id] = checkPromise;
+    return checkPromise;
 }
+
 
 function applySentiment(data) {
     return new Promise((resolve, reject) => {
