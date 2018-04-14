@@ -24,27 +24,46 @@ const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, fi
     cp();
 }];
 
-const pendingCheckDeveloper = {
+const pendingDevelopers = {
 
 };
+let running;
+
+function startDeveloperCreatorQueue() {
+    Promise.map(_.keys(pendingDevelopers), (key) => {
+        console.log(`Check ${key}`);
+        return Developer.count({
+            "value.login": key
+        }).then(n => {
+            if (n === 0) {
+                console.log(`Creating a new developer ${key}`);
+                return new Developer({
+                    key,
+                    value: pendingDevelopers[key]
+                }).save().then(() => {
+                    delete pendingDevelopers[key];
+                });
+            } else {
+                delete pendingDevelopers[key];
+            }
+        });
+
+    }, {
+        concurrency: 5
+    }).then(() => {
+        const keys = _.keys(pendingDevelopers);
+        if (running || keys.length !== 0) {
+            console.log('Will run startDeveloperCreatorQueue again')
+            setTimeout(startDeveloperCreatorQueue, 500);
+        }
+    });
+}
 
 function checkDeveloper(interaction) {
     const value = _.get(interaction, 'user', _.get(interaction, 'author'));
     const id = _.get(value, 'login');
     if (!id) return Promise.resolve();
-    const checkPromise = pendingCheckDeveloper[id] || Developer.count({
-        "value.login": id
-    }).then(n => {
-        if (n === 0 && id) {
-            console.log(`Creating a new developer ${_.get(interaction, 'user.login')}`)
-            return new Developer({
-                id,
-                value
-            }).save();
-        }
-    });
-    pendingCheckDeveloper[id] = checkPromise;
-    return checkPromise;
+    pendingDevelopers[id] = value;
 }
 
 
@@ -70,6 +89,8 @@ function applySentiment(data) {
 }
 
 function importProject(projectUrl) {
+    running = true;
+    startDeveloperCreatorQueue();
     return gitHubUtil
         .getData(`https://api.github.com/repos/${projectUrl}`, ['pulls_url', 'commits_url'])
         .then((project) => {
@@ -130,6 +151,7 @@ function importProject(projectUrl) {
             });
         }).then(project => {
             console.log(project.full_name);
+            running = false;
             return project;
         });
 }

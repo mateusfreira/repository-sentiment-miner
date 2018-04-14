@@ -4,6 +4,9 @@ const {
     importProject
 } = require('../service/sentiment/ProjectImport.js');
 const {
+    processSWB
+} = require('../service/sentiment/SubjectiveWellBeing.js');
+const {
     dayOfWeekSentiment,
     sentimentByType,
     worstAndTheBest,
@@ -189,6 +192,16 @@ async function init() {
             logger.error('api', e);
             res.send(404, 'not found');
         });
+    });
+
+    server.get('/process/swb', function(req, res, next) {
+        processSWB({
+            _project: ObjectId(req.query._project)
+        }, 1);
+        res.send({
+            ok: true
+        });
+        next();
     });
 
     server.get('/process/developers', function(req, res, next) {

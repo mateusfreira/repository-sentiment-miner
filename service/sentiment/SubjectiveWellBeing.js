@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
-const models = require("./model/index.js");
+const models = require("../../model/mongo/index.js");
 const moment = require("moment");
-const util = require("../util.js");
+const util = require("../../lib/util.js");
 const Pull = models.Pull;
 const Commits = models.Commit;
 const PullReviews = models.PullReviews;
@@ -72,7 +72,7 @@ const FILTER_QUERY = {
         $exists: false
     }
 };
-async function processNext(hour = 2) {
+async function processNext(filter = {}, hour = 2) {
     return Developer.findOne(FILTER_QUERY)
         .sort({
             _id: 'asc'

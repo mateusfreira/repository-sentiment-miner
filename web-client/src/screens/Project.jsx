@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import axios from 'axios';
-import { Pie, Line } from 'react-chartjs-2';
+import { Pie, Line, Bar } from 'react-chartjs-2';
 import CommitMiner from '../services/CommitMiner.js';
 /* UI Components */
 import {
@@ -125,6 +125,52 @@ function getLineChartData(data) {
     ]
   };
 }
+function getComparativeChart(self, sentimentData, generalData) {
+  const data = {
+    labels: ['Comments', 'Reviews', 'Commits'],
+    datasets: [
+      {
+        label: 'Median',
+        type: 'line',
+        data: [51, 65, 40],
+        fill: false,
+        borderColor: '#EC932F',
+        backgroundColor: '#EC932F',
+        pointBorderColor: '#EC932F',
+        pointBackgroundColor: '#EC932F',
+        pointHoverBackgroundColor: '#EC932F',
+        pointHoverBorderColor: '#EC932F',
+        yAxisID: 'y-axis-2'
+      },
+      {
+        type: 'bar',
+        label: 'Positive',
+        data: [40, 80, 12],
+        fill: false,
+        backgroundColor: '#71B37C',
+        borderColor: '#71B37C',
+        hoverBackgroundColor: '#71B37C',
+        hoverBorderColor: '#71B37C',
+        yAxisID: 'y-axis-1'
+      },
+      {
+        type: 'bar',
+        label: 'Negative',
+        data: [40, 80, 12],
+        fill: false,
+        backgroundColor: 'red',
+        borderColor: 'red',
+        hoverBackgroundColor: 'red',
+        hoverBorderColor: 'red',
+        yAxisID: 'y-axis-1'
+      }
+    ]
+  };
+  self.state.comparative.data = data;
+  return self.setState({
+    comparative: self.state.comparative
+  });
+}
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
@@ -136,6 +182,63 @@ class ProjectPage extends React.Component {
       sentimentals: [],
       bests: [],
       onceContributors: {},
+      comparative: {
+        data: [],
+        options: {
+          responsive: true,
+          tooltips: {
+            mode: 'label'
+          },
+          elements: {
+            line: {
+              fill: false
+            }
+          },
+          scales: {
+            xAxes: [
+              {
+                display: true,
+                gridLines: {
+                  display: false
+                }
+                /*
+                        labels: {
+                            show: true
+                        }*/
+              }
+            ],
+            yAxes: [
+              {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                id: 'y-axis-1',
+                gridLines: {
+                  display: false
+                }
+                /*
+                            labels: {
+                                show: true
+                            }*/
+              },
+              {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                id: 'y-axis-2',
+                gridLines: {
+                  display: false
+                }
+                /*
+                            labels: {
+                                show: true
+                            }*/
+              }
+            ]
+          }
+        },
+        plugins: {}
+      },
       project: {
         commits: []
       },
@@ -186,6 +289,7 @@ class ProjectPage extends React.Component {
       });
     };
     updateProjectStatus();
+    getComparativeChart(this);
     this.setState({
       update: true
     });
@@ -208,6 +312,16 @@ class ProjectPage extends React.Component {
           {' '}
           {this.state.project.full_name} ({this.state.project.language})
         </h2>
+        <div style={{ width: '100%', float: 'left' }}>
+          <h2> Comparative </h2>
+          <Bar
+            data={this.state.comparative.data}
+            height={50}
+            options={this.state.comparative.options}
+            plugins={this.state.comparative.plugins}
+            redraw={true}
+          />
+        </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Comments </h2>
           <Pie data={this.state.chartData} redraw={true} />
