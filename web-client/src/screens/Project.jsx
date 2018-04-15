@@ -130,9 +130,9 @@ function getComparativeChart(self, sentimentData, generalData) {
     labels: ['Comments', 'Reviews', 'Commits'],
     datasets: [
       {
-        label: 'Median',
+        label: 'Negative Mean',
         type: 'line',
-        data: [51, 65, 40],
+        data: [14, 12, 15],
         fill: false,
         borderColor: '#EC932F',
         backgroundColor: '#EC932F',
@@ -143,9 +143,27 @@ function getComparativeChart(self, sentimentData, generalData) {
         yAxisID: 'y-axis-2'
       },
       {
+        label: 'Positive Mean',
+        type: 'line',
+        data: [51, 65, 40],
+        fill: false,
+        borderColor: '#006400',
+        backgroundColor: '#006400',
+        pointBorderColor: '#006400',
+        pointBackgroundColor: '#006400',
+        pointHoverBackgroundColor: '#006400',
+        pointHoverBorderColor: '#006400',
+        yAxisID: 'y-axis-2'
+      },
+
+      {
         type: 'bar',
         label: 'Positive',
-        data: [40, 80, 12],
+        data: [
+          sentimentData.comments.positive,
+          sentimentData.reviews.positive,
+          sentimentData.commits.positive
+        ],
         fill: false,
         backgroundColor: '#71B37C',
         borderColor: '#71B37C',
@@ -156,7 +174,11 @@ function getComparativeChart(self, sentimentData, generalData) {
       {
         type: 'bar',
         label: 'Negative',
-        data: [40, 80, 12],
+        data: [
+          sentimentData.comments.negative,
+          sentimentData.reviews.negative,
+          sentimentData.commits.negative
+        ],
         fill: false,
         backgroundColor: 'red',
         borderColor: 'red',
@@ -253,6 +275,7 @@ class ProjectPage extends React.Component {
     const self = this;
     const updateProjectStatus = () => {
       this.service.getInteractionsReport(this.projectName).then(({ data }) => {
+        getComparativeChart(this, data);
         this.setState({
           chartData: getPieChartData(data.comments),
           reviewChartData: getPieChartData(data.reviews),
@@ -289,7 +312,6 @@ class ProjectPage extends React.Component {
       });
     };
     updateProjectStatus();
-    getComparativeChart(this);
     this.setState({
       update: true
     });

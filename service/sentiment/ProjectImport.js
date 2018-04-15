@@ -5,7 +5,7 @@ const async = require('async');
 const gitHubUtil = require('../../lib/gitHubUtil.js');
 const models = require("../../model/mongo/index.js");
 const Developer = models.Developer;
-const Pull = models.Pull;
+const Pull = positive.Pull;
 const Project = models.Project;
 const PullComments = models.PullComments;
 const PullReviews = models.PullReviews;
@@ -141,6 +141,7 @@ function importProject(projectUrl) {
                 return applySentiment(project._commits, mongoProject)
                     .then(commits => commits.map(c => {
                         c._project = mongoProject._id;
+                        c.body = _.get(c, 'commit.message');
                         return new Commit(c).save();
                     }))
                     .then(() => project);
