@@ -5,11 +5,14 @@ const async = require('async');
 const gitHubUtil = require('../../lib/gitHubUtil.js');
 const models = require("../../model/mongo/index.js");
 const Developer = models.Developer;
-const Pull = positive.Pull;
+const Pull = models.Pull;
 const Project = models.Project;
 const PullComments = models.PullComments;
 const PullReviews = models.PullReviews;
 const Commit = models.Commit;
+const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
+const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
+
 
 const applySentiStrengthStanfordParser = require('../../../github-sentiment-analysis-code-smells-scripts/sentistrength-stanford-parser')
     .applySentiStrengthStanfordParser;
@@ -138,10 +141,12 @@ function importProject(projectUrl) {
             }).then((pulls) => {
                 return project;
             }).then(function(project) {
-                return applySentiment(project._commits, mongoProject)
+                return applySentiment(project._commits.map((c) => {
+                        c.body = _.get(c, 'commit.message')
+                        return c;
+                    }), mongoProject)
                     .then(commits => commits.map(c => {
                         c._project = mongoProject._id;
-                        c.body = _.get(c, 'commit.message');
                         return new Commit(c).save();
                     }))
                     .then(() => project);
@@ -154,6 +159,8 @@ function importProject(projectUrl) {
             console.log(project.full_name);
             running = false;
             return project;
+        }).then((project) => {
+            return Promise.all([processSWB(project._id), processDevelopersProfile(project._id)]);
         });
 }
 module.exports.importProject = importProject;

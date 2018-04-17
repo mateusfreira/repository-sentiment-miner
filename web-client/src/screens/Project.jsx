@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import Promise from 'bluebird';
 import axios from 'axios';
 import { Pie, Line, Bar } from 'react-chartjs-2';
 import CommitMiner from '../services/CommitMiner.js';
@@ -132,7 +133,11 @@ function getComparativeChart(self, sentimentData, generalData) {
       {
         label: 'Negative Mean',
         type: 'line',
-        data: [14, 12, 15],
+        data: [
+          generalData.comments.negative,
+          generalData.reviews.negative,
+          generalData.commits.negative
+        ],
         fill: false,
         borderColor: '#EC932F',
         backgroundColor: '#EC932F',
@@ -145,7 +150,11 @@ function getComparativeChart(self, sentimentData, generalData) {
       {
         label: 'Positive Mean',
         type: 'line',
-        data: [51, 65, 40],
+        data: [
+          generalData.comments.positive,
+          generalData.reviews.positive,
+          generalData.commits.positive
+        ],
         fill: false,
         borderColor: '#006400',
         backgroundColor: '#006400',
@@ -274,12 +283,15 @@ class ProjectPage extends React.Component {
   componentDidMount() {
     const self = this;
     const updateProjectStatus = () => {
-      this.service.getInteractionsReport(this.projectName).then(({ data }) => {
-        getComparativeChart(this, data);
+      Promise.props({
+        project: this.service.getInteractionsReport(this.projectName),
+        general: this.service.getInteractionsReport()
+      }).then(({ project, general }) => {
+        getComparativeChart(this, project.data, general.data);
         this.setState({
-          chartData: getPieChartData(data.comments),
-          reviewChartData: getPieChartData(data.reviews),
-          commitsChartData: getPieChartData(data.commits)
+          chartData: getPieChartData(project.data.comments),
+          reviewChartData: getPieChartData(project.data.reviews),
+          commitsChartData: getPieChartData(project.data.commits)
         });
       });
 
@@ -341,32 +353,53 @@ class ProjectPage extends React.Component {
             height={50}
             options={this.state.comparative.options}
             plugins={this.state.comparative.plugins}
-            redraw={true}
+            nredraw={true}
           />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Comments </h2>
-          <Pie data={this.state.chartData} redraw={true} />
+          <Pie data={this.state.chartData} nredraw={true} />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2>Reviews</h2>
-          <Pie data={this.state.reviewChartData} redraw={true} />
+          <Pie data={this.state.reviewChartData} nredraw={true} />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Commits </h2>
-          <Pie data={this.state.commitsChartData} redraw={true} />
+          <Pie data={this.state.commitsChartData} nredraw={true} />
         </div>
         <div>
-          <span style={{ width: '33%', float: 'left' }}>
+          <span style={{ width: '50%', float: 'left' }}>
             <h2> Sentiment by weekday </h2>
-            <Line data={this.state.lineChartData} />
+            <Line height="50" data={this.state.lineChartData} />
           </span>
+        </div>
+        <div
+          style={{
+            'border-left': '1px solid gray',
+            'border-top': '1px solid gray',
+            width: '49%',
+            float: 'left'
+          }}
+        >
+          <h2> Contributors </h2>
+          <Pie
+            data={getPieChartData(
+              [
+                this.state.onceContributors.once,
+                this.state.onceContributors.moreThanOnce
+              ],
+              ['Once', 'More than once'],
+              ['gray', 'green']
+            )}
+            nredraw={true}
+          />
         </div>
         <div
           style={{
             'border-rigth': '1px solid gray',
             'border-bottom': '1px solid gray',
-            width: '33%',
+            width: '49%',
             float: 'left'
           }}
         >
@@ -389,7 +422,7 @@ class ProjectPage extends React.Component {
           style={{
             'border-left': '1px solid gray',
             'border-bottom': '1px solid gray',
-            width: '33%',
+            width: '49%',
             float: 'left'
           }}
         >
@@ -443,33 +476,13 @@ class ProjectPage extends React.Component {
                           developer.contribuitions.comments.sentiment.geral
                             .negative || 0
                       })}
-                      redraw={true}
+                      nredraw={true}
                     />
                   </TableRowColumn>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
-        <div
-          style={{
-            'border-left': '1px solid gray',
-            width: '49%',
-            float: 'left'
-          }}
-        >
-          <h2> Contributors </h2>
-          <Pie
-            data={getPieChartData(
-              [
-                this.state.onceContributors.once,
-                this.state.onceContributors.moreThanOnce
-              ],
-              ['Once', 'More than once'],
-              ['gray', 'green']
-            )}
-            redraw={true}
-          />
         </div>
       </span>
     );

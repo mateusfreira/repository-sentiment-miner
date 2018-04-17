@@ -33,7 +33,7 @@ class CommitMiner {
     );
   }
 
-  getInteractionsReport(project) {
+  getInteractionsReport(project = '') {
     return axios.get(
       `http://${this.domain}:8081/reports/sentimentByType?_project=${project}`
     );

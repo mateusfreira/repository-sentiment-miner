@@ -6,6 +6,11 @@ const {
 const {
     processSWB
 } = require('../service/sentiment/SubjectiveWellBeing.js');
+
+const {
+    processDevelopersProfile
+} = require('../service/sentiment/DeveloperProcess.js');
+
 const {
     dayOfWeekSentiment,
     sentimentByType,
@@ -25,9 +30,6 @@ const logger = util.getLogger();
 const {
     ObjectId
 } = require('mongoose').Types.ObjectId;
-const {
-    processDevelopersProfile
-} = require('../service/sentiment/DeveloperProcess.js');
 
 async function restoreState(persistenceManager) {
     const projectsName = await persistenceManager.findProjectsName();
@@ -159,9 +161,10 @@ async function init() {
 
     server.get('/reports/sentimentByType', function(req, res, next) {
         const query = req.query;
-        return sentimentByType({
+        const filter = query._project ? {
             _project: ObjectId(query._project)
-        }).then(r => {
+        } : {};
+        return sentimentByType(filter).then(r => {
             res.send(r);
             next();
         }).catch(e => {
