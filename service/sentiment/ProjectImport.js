@@ -104,7 +104,7 @@ function importProject(projectUrl) {
             const mongoProject = new Project(project);
             mongoProject.set('_commits', undefined);
             mongoProject.set('_pulls', undefined);
-            mongoProject.set('precent', 50);
+            mongoProject.set('percent', 50);
             return mongoProject.save()
                 .then(() => Promise.map(project._pulls, (pull) => {
                     return Promise.all([
@@ -159,7 +159,7 @@ function importProject(projectUrl) {
                         }))
                         .then(() => project);
                 }).then(function(project) {
-                    mongoProject.set('precent', 100);
+                    mongoProject.set('percent', 100);
                     return mongoProject.save();
                 });
         }).then(project => {
