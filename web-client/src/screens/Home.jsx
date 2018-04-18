@@ -41,7 +41,7 @@ class ProjectTable extends Component {
     this.service
       .getProjectList()
       .then(({ data }) => {
-        data.forEach(_.partial(updateProjectState, _, data, this));
+        //data.filter(p => p.percent != 100).forEach(_.partial(updateProjectState, _, data, this));
         this.setState({
           projects: data
         });
@@ -84,8 +84,8 @@ class ProjectTable extends Component {
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
               <TableRow>
                 <TableHeaderColumn>Project</TableHeaderColumn>
-                <TableHeaderColumn>Total commits</TableHeaderColumn>
-                <TableHeaderColumn>Processed commits</TableHeaderColumn>
+                <TableHeaderColumn>Stargazers</TableHeaderColumn>
+                <TableHeaderColumn>Forks</TableHeaderColumn>
                 <TableHeaderColumn>Progress</TableHeaderColumn>
               </TableRow>
             </TableHeader>
@@ -93,16 +93,13 @@ class ProjectTable extends Component {
               {this.state.projects.map((project, idx) => (
                 <ClickableRow key={`p${idx}`}>
                   <TableRowColumn>{project.name}</TableRowColumn>
-                  <TableRowColumn>{project.commitsCount}</TableRowColumn>
-                  <TableRowColumn>{project.processedCount}</TableRowColumn>
+                  <TableRowColumn>{project.stargazers_count}</TableRowColumn>
+                  <TableRowColumn>{project.forks_count}</TableRowColumn>
                   <TableRowColumn>
                     {project.percent === 100 ? (
                       <i>Finished</i>
                     ) : (
-                      <CircularProgress
-                        mode="determinate"
-                        value={project.percent || 0}
-                      />
+                      <CircularProgress />
                     )}
                   </TableRowColumn>
                 </ClickableRow>

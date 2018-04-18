@@ -10,8 +10,12 @@ const Project = models.Project;
 const PullComments = models.PullComments;
 const PullReviews = models.PullReviews;
 const Commit = models.Commit;
-const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
-const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
+const {
+    processSWB
+} = require('../../service/sentiment/SubjectiveWellBeing.js');
+const {
+    processDevelopersProfile
+} = require('../../service/sentiment/DeveloperProcess.js');
 
 
 const applySentiStrengthStanfordParser = require('../../../github-sentiment-analysis-code-smells-scripts/sentistrength-stanford-parser')
@@ -98,63 +102,66 @@ function importProject(projectUrl) {
         .getData(`https://api.github.com/repos/${projectUrl}`, ['pulls_url', 'commits_url'])
         .then((project) => {
             const mongoProject = new Project(project);
-            return Promise.map(project._pulls, (pull) => {
-                return Promise.all([
-                    gitHubUtil.getData(pull.comments_url),
-                    gitHubUtil.getData(pull.review_comments_url),
-                    gitHubUtil.getData(pull.commits_url).then(commits => commits.map(c => {
-                        c.body = _.get(c, 'commit.message');
-                        return c;
-                    })),
-                    gitHubUtil.getData(pull.comments_url.replace('comments', 'events'))
-                ]).spread((_comments, _reviews, _commits, _events) => {
-                    const interactions = _.flatten([pull, _comments, _reviews, _commits, _events]);
-                    return applySentiment(interactions, mongoProject).then(() => Promise.map(interactions, interaction => {
-                        interaction._project = mongoProject._id;
-                        return checkDeveloper(interaction);
-                    }).then(() => {
-                        delete pull._commits;
-                        delete pull._comments;
-                        delete pull._reviews;
-                        pull._events = _events;
-                        const pullMongo = new Pull(pull);
-                        return Promise.all([
-                            pullMongo.save(),
-                            Promise.all(_comments.map(c => {
-                                c._pull = pullMongo._id;
-                                return new PullComments(c).save();
-                            })),
-                            Promise.all(_reviews.map(c => {
-                                c._pull = pull._id;
-                                return new PullReviews(c).save();
-                            })),
-                        ]);
-                    }).then(() => {
-                        return Object.assign(pull, {
-                            _commits,
-                            _events
-                        });
-                    }));
+            mongoProject.set('_commits', undefined);
+            mongoProject.set('_pulls', undefined);
+            mongoProject.set('precent', 50);
+            return mongoProject.save()
+                .then(() => Promise.map(project._pulls, (pull) => {
+                    return Promise.all([
+                        gitHubUtil.getData(pull.comments_url),
+                        gitHubUtil.getData(pull.review_comments_url),
+                        gitHubUtil.getData(pull.commits_url).then(commits => commits.map(c => {
+                            c.body = _.get(c, 'commit.message');
+                            return c;
+                        })),
+                        gitHubUtil.getData(pull.comments_url.replace('comments', 'events'))
+                    ]).spread((_comments, _reviews, _commits, _events) => {
+                        const interactions = _.flatten([pull, _comments, _reviews, _commits, _events]);
+                        return applySentiment(interactions, mongoProject).then(() => Promise.map(interactions, interaction => {
+                            interaction._project = mongoProject._id;
+                            return checkDeveloper(interaction);
+                        }).then(() => {
+                            delete pull._commits;
+                            delete pull._comments;
+                            delete pull._reviews;
+                            pull._events = _events;
+                            const pullMongo = new Pull(pull);
+                            return Promise.all([
+                                pullMongo.save(),
+                                Promise.all(_comments.map(c => {
+                                    c._pull = pullMongo._id;
+                                    return new PullComments(c).save();
+                                })),
+                                Promise.all(_reviews.map(c => {
+                                    c._pull = pull._id;
+                                    return new PullReviews(c).save();
+                                })),
+                            ]);
+                        }).then(() => {
+                            return Object.assign(pull, {
+                                _commits,
+                                _events
+                            });
+                        }));
+                    });
+                }, {
+                    concurrency: 1
+                })).then((pulls) => {
+                    return project;
+                }).then(function(project) {
+                    return applySentiment(project._commits.map((c) => {
+                            c.body = _.get(c, 'commit.message')
+                            return c;
+                        }), mongoProject)
+                        .then(commits => commits.map(c => {
+                            c._project = mongoProject._id;
+                            return new Commit(c).save();
+                        }))
+                        .then(() => project);
+                }).then(function(project) {
+                    mongoProject.set('precent', 100);
+                    return mongoProject.save();
                 });
-            }, {
-                concurrency: 1
-            }).then((pulls) => {
-                return project;
-            }).then(function(project) {
-                return applySentiment(project._commits.map((c) => {
-                        c.body = _.get(c, 'commit.message')
-                        return c;
-                    }), mongoProject)
-                    .then(commits => commits.map(c => {
-                        c._project = mongoProject._id;
-                        return new Commit(c).save();
-                    }))
-                    .then(() => project);
-            }).then(function(project) {
-                mongoProject.set('_commits', undefined);
-                mongoProject.set('_pulls', undefined);
-                return mongoProject.save();
-            });
         }).then(project => {
             console.log(project.full_name);
             running = false;

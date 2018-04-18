@@ -369,7 +369,7 @@ class ProjectPage extends React.Component {
           <Pie data={this.state.commitsChartData} nredraw={true} />
         </div>
         <div>
-          <span style={{ width: '50%', float: 'left' }}>
+          <span style={{ width: '49%', float: 'left' }}>
             <h2> Sentiment by weekday </h2>
             <Line height="50" data={this.state.lineChartData} />
           </span>
