@@ -167,13 +167,42 @@ async function processNext(filter = {}, hour = 2) {
                 });
             })).then(() => {
                 dev.swbProcessing = false;
+                const swbs = Object.keys(dev.swb || {})
+                    .map(key => {
+                        const swb = dev.swb[key];
+                        return Object.keys(swb).map((rule) => swb[rule]).reduce((current, actual) => {
+                            return current.concat(actual);
+                        }, []);
+                    }).reduce((current, actual) => current.concat(actual), []);
+                const sum = sumResults(swbs);
+                const avg = sum / swbs.length;
+                const swbFromNegative = swbs.filter(swb => swb.commentSentiment < 0);
+                const swbFromPositive = swbs.filter(swb => swb.commentSentiment > 0);
+                const sumNegative = sumResults(swbFromNegative);
+                const sumPositive = sumResults(swbFromPositive);
+                dev.swbGeneral = {
+                    count: swbs.length,
+                    sum,
+                    avg
+                };
+                dev.swbNegative = {
+                    count: swbFromNegative.length,
+                    sum: sumNegative,
+                    avg: sumNegative / swbFromNegative.length
+                };
+
+                dev.swbPositive = {
+                    count: swbFromPositive.length,
+                    sum: sumPositive,
+                    avg: sumPositive / swbFromPositive.length
+                };
                 return saveDeveloper(dev);
             }).then(function() {
-                Developer.count(FILTER_QUERY);
+                return Developer.count(FILTER_QUERY);
             });
         }).then((developers) => {
             if (developers != 0) {
-                return processNext();
+                return processNext(filter, hour);
             }
         }).then(() => {
             console.log("SWB Success \o/");
@@ -182,5 +211,9 @@ async function processNext(filter = {}, hour = 2) {
         });
 }
 
+function sumResults(swbs) {
+    const results = swbs.map(r => r.result);
+    return results.reduce((a, b) => a + b, 0);
+}
 
 module.exports.processSWB = processNext;
