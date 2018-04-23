@@ -200,7 +200,7 @@ async function init() {
     server.get('/process/swb', function(req, res, next) {
         processSWB({
             _project: ObjectId(req.query._project)
-        }, 1);
+        }, 4);
         res.send({
             ok: true
         });

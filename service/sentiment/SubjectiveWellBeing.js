@@ -167,13 +167,24 @@ async function processNext(filter = {}, hour = 2) {
                 });
             })).then(() => {
                 dev.swbProcessing = false;
+                const results = Object.keys(dev.swb || {})
+                    .map(key => {
+                        const swb = dev.swb[key];
+                        return Object.keys(swb).map((rule) => swb[rule]).reduce((current, actual) => {
+                            return current.concat(actual);
+                        }, []).map(r => r.result);
+                    }).reduce((current, actual) => current.concat(actual));
+                const sum = results.reduce((a, b) => a + b, 0);
+                const avg = sum / results.length;
+                dev.swbSum = sum;
+                dev.swbAvg = avg;
                 return saveDeveloper(dev);
             }).then(function() {
                 Developer.count(FILTER_QUERY);
             });
         }).then((developers) => {
             if (developers != 0) {
-                return processNext();
+                return processNext(filter, hour);
             }
         }).then(() => {
             console.log("SWB Success \o/");
