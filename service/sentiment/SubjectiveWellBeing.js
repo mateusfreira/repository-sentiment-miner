@@ -195,20 +195,28 @@ async function processNext(filter = {}, hour = 2) {
                     count: swbFromPositive.length,
                     sum: sumPositive,
                     avg: sumPositive / swbFromPositive.length
-                };
-                return saveDeveloper(dev);
-            }).then(function() {
-                return Developer.count(FILTER_QUERY);
-            });
-        }).then((developers) => {
-            if (developers != 0) {
-                return processNext(filter, hour);
-            }
-        }).then(() => {
-            console.log("SWB Success \o/");
-        }).catch((e) => {
-            console.error("SWB Error :(", e)
-        });
+                }; ===
+                === =
+            }, []).map(r => r.result);
+        }).reduce((current, actual) => current.concat(actual));
+    const sum = results.reduce((a, b) => a + b, 0);
+    const avg = sum / results.length;
+    dev.swbSum = sum;
+    dev.swbAvg = avg; >>>
+    >>> > 02090611 d9ef1e4ff0b46fdaa5f3f61b6aef9a24
+    return saveDeveloper(dev);
+}).then(function() {
+return Developer.count(FILTER_QUERY);
+});
+}).then((developers) => {
+    if (developers != 0) {
+        return processNext(filter, hour);
+    }
+}).then(() => {
+    console.log("SWB Success \o/");
+}).catch((e) => {
+    console.error("SWB Error :(", e)
+});
 }
 
 function sumResults(swbs) {
