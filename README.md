@@ -36,6 +36,7 @@ your-command project_name commit_dir commit_info_in_json
 * Run `commit-miner s`
 ## From source code
 * Clone the repository
+* Create a './config/default.json' using `./config/dev.json` as a example
 * run `npm i`
 * run `npm run server` (To start the server)
 * run `npm run client` (To start the web client)
