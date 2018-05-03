@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 MAINTAINER @luisfidelis - luizsale10@gmail.com
 
-ENV COMMITS_MINER_REPOSITORY https://github.com/mateusfreira/commits-miner
-ENV SCRIPTS_REPOSITORY https://github.com/mateusfreira/github-sentiment-analysis-code-smells-scripts
+ENV COMMITS_MINER_REPOSITORY git@github.com:mateusfreira/commits-miner.git
+ENV SCRIPTS_REPOSITORY git@github.com:mateusfreira/github-sentiment-analysis-code-smells-scripts.git
 
 ENV MONGO_DB_URL ""
 ENV MONGO_DB_USER ""
@@ -14,8 +14,17 @@ ENV IMAGE_USER commits
 ENV IMAGE_PASSWORD 123456
 ENV COMMITS_MINER_HOME /home/${IMAGE_USER}
 
+# add credentials on build
+ARG SSH_PRIVATE_KEY
+RUN mkdir /root/.ssh/
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
+
+# make sure your domain is accepted
+RUN touch /root/.ssh/known_hosts
+RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+
 # Install environment dependencies
-RUN apt-get update && apt-get install -y nano vim git curl make gcc build-essential g++ apt-utils
+RUN apt-get update && apt-get install -y git
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash
 RUN apt-get install -y nodejs
 
@@ -32,6 +41,15 @@ RUN mkdir ${COMMITS_MINER_HOME}/.npm-global && \
     npm config set prefix '${COMMITS_MINER_HOME}/.npm-global' && \
     echo "export PATH=${COMMITS_MINER_HOME}/.npm-global/bin:$PATH" >> ${COMMITS_MINER_HOME}/.profile && \
     export PATH=${COMMITS_MINER_HOME}/.npm-global/bin:$PATH 
+
+# add credentials on build
+ARG SSH_PRIVATE_KEY
+RUN mkdir /root/.ssh/
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
+
+# make sure your domain is accepted
+RUN touch /root/.ssh/known_hosts
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Clone and build commits-miner
 RUN mkdir ./www && \
