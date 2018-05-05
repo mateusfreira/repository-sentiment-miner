@@ -65,9 +65,10 @@ function subjectiveWellbeen(sentiments) {
     return swb;
 }
 const FILTER_QUERY = {
-    swb: {
-        $exists: false
-    },
+    /*    swb: {
+            $exists: false
+        },
+        */
     swbProcessing: {
         $exists: false
     }
@@ -180,43 +181,38 @@ async function processNext(filter = {}, hour = 2) {
                 const swbFromPositive = swbs.filter(swb => swb.commentSentiment > 0);
                 const sumNegative = sumResults(swbFromNegative);
                 const sumPositive = sumResults(swbFromPositive);
-                dev.swbGeneral = {
+                dev.swb = dev.swb || {};
+                dev.swb[hour] = {};
+                dev.swb[hour].swbGeneral = {
                     count: swbs.length,
                     sum,
                     avg
                 };
-                dev.swbNegative = {
+                dev.swb[hour].swbNegative = {
                     count: swbFromNegative.length,
                     sum: sumNegative,
                     avg: sumNegative / swbFromNegative.length
                 };
 
-                dev.swbPositive = {
+                dev.swb[hour].swbPositive = {
                     count: swbFromPositive.length,
                     sum: sumPositive,
                     avg: sumPositive / swbFromPositive.length
-                }; ===
-                === =
-            }, []).map(r => r.result);
-        }).reduce((current, actual) => current.concat(actual));
-    const sum = results.reduce((a, b) => a + b, 0);
-    const avg = sum / results.length;
-    dev.swbSum = sum;
-    dev.swbAvg = avg; >>>
-    >>> > 02090611 d9ef1e4ff0b46fdaa5f3f61b6aef9a24
-    return saveDeveloper(dev);
-}).then(function() {
-return Developer.count(FILTER_QUERY);
-});
-}).then((developers) => {
-    if (developers != 0) {
-        return processNext(filter, hour);
-    }
-}).then(() => {
-    console.log("SWB Success \o/");
-}).catch((e) => {
-    console.error("SWB Error :(", e)
-});
+                };
+                console.log(dev.swb);
+                return saveDeveloper(dev);
+            });
+        }).then(function() {
+            return Developer.count(FILTER_QUERY);
+        }).then((developers) => {
+            if (developers != 0) {
+                return processNext(filter, hour);
+            }
+        }).then(() => {
+            console.log("SWB Success \o/");
+        }).catch((e) => {
+            console.error("SWB Error :(", e)
+        });
 }
 
 function sumResults(swbs) {
@@ -224,4 +220,14 @@ function sumResults(swbs) {
     return results.reduce((a, b) => a + b, 0);
 }
 
-module.exports.processSWB = processNext;
+module.exports.processSWB = function(filter = {}, hour = 2) {
+    return Developer.update(_.omit(FILTER_QUERY, ['swbProcessing']), {
+        $unset: {
+            swbProcessing: true
+        }
+    }, {
+        multi: true
+    }).then((a) => {
+        return processNext(filter, hour);
+    });
+}

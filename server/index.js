@@ -198,9 +198,13 @@ async function init() {
     });
 
     server.get('/process/swb', function(req, res, next) {
-        processSWB({
+        const filter = {
             _project: ObjectId(req.query._project)
-        }, 2);
+        };
+        processSWB(filter, 2)
+            .then(processSWB.bind(null, filter, 4))
+            .then(processSWB.bind(null, filter, 8))
+            .then(processSWB.bind(null, filter, 16));
         res.send({
             ok: true
         });
