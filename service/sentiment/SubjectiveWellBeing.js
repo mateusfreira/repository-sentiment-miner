@@ -107,7 +107,6 @@ async function processNext(filter = {}, hour = 2) {
             }).lean();
             console.log('will get the relation:', dev.value.login);
             const commentQuery = devQuery(dev);
-            dev.swb = {};
             return Promise.map(commentsOnItsPrs, (comment => {
                 const beforeFilter = {
                     $gte: moment(comment.created_at).subtract(hour, 'hours').toDate(),
@@ -145,7 +144,9 @@ async function processNext(filter = {}, hour = 2) {
                     const swbBeforeComments = subjectiveWellbeen(beforeComments || []);
                     const swbAfterCommits = subjectiveWellbeen(afterCommits || []);
                     const swbAfterComments = subjectiveWellbeen(afterComments || []);
-                    const projectSwb = dev.swb[comment._project.toString()] = dev.swb[comment._project.toString()] || {};
+                    dev.swb = dev.swb || {};
+                    const hourSwb = dev.swb[hour] = dev.swb[hour] || {};
+                    const projectSwb = hourSwb[comment._project.toString()] = hourSwb[comment._project.toString()] || {};
                     projectSwb[comment.author_association] = projectSwb[comment.author_association] || [];
                     const swb = projectSwb[comment.author_association];
                     console.log(`swb processd for ${comment.author_association}  in ${comment._project.toString()},  ${swb.length}`)
@@ -168,9 +169,12 @@ async function processNext(filter = {}, hour = 2) {
                 });
             })).then(() => {
                 dev.swbProcessing = false;
-                const swbs = Object.keys(dev.swb || {})
+                dev.swb = dev.swb || {};
+                dev.swb[hour] = dev.swb[hour] || {};
+                const swbHour = dev.swb[hour];
+                const swbs = Object.keys(swbHour || {})
                     .map(key => {
-                        const swb = dev.swb[key];
+                        const swb = swbHour[key];
                         return Object.keys(swb).map((rule) => swb[rule]).reduce((current, actual) => {
                             return current.concat(actual);
                         }, []);
@@ -181,25 +185,23 @@ async function processNext(filter = {}, hour = 2) {
                 const swbFromPositive = swbs.filter(swb => swb.commentSentiment > 0);
                 const sumNegative = sumResults(swbFromNegative);
                 const sumPositive = sumResults(swbFromPositive);
-                dev.swb = dev.swb || {};
-                dev.swb[hour] = {};
-                dev.swb[hour].swbGeneral = {
+                swbHour.swbGeneral = {
                     count: swbs.length,
                     sum,
                     avg
                 };
-                dev.swb[hour].swbNegative = {
+
+                swbHour.swbNegative = {
                     count: swbFromNegative.length,
                     sum: sumNegative,
                     avg: sumNegative / swbFromNegative.length
                 };
 
-                dev.swb[hour].swbPositive = {
+                swbHour.swbPositive = {
                     count: swbFromPositive.length,
                     sum: sumPositive,
                     avg: sumPositive / swbFromPositive.length
                 };
-                console.log(dev.swb);
                 return saveDeveloper(dev);
             });
         }).then(function() {
@@ -216,7 +218,7 @@ async function processNext(filter = {}, hour = 2) {
 }
 
 function sumResults(swbs) {
-    const results = swbs.map(r => r.result);
+    const results = swbs.map(r => r.result).filter(v => !isNaN(v));
     return results.reduce((a, b) => a + b, 0);
 }
 

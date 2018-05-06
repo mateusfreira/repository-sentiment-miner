@@ -27,7 +27,6 @@ const positiveFilter = {
 };
 
 function dayOfWeekSentiment($match = {}) {
-    console.log($match)
     return PullComments.aggregate(
         [{
                 $match: _.clone($match),
@@ -113,6 +112,19 @@ class Reports {
                     $gt: 1
                 }
             }),
+        });
+    }
+
+    swbRelevantChange(project) {
+        return Developers.find({
+            [`swb.${project}`]: {
+                $exists: true
+            }
+        }).then(devs => {
+            return devs.map((dev) => dev.swb[project])
+                .map(dev => Object.keys(dev).map(key => dev[key]))
+                .reduce((agg, current) => agg.concat(current), [])
+                .reduce((agg, current) => agg.concat(current), []);
         });
     }
 }
