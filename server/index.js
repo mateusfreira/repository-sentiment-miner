@@ -12,6 +12,7 @@ const {
 } = require('../service/sentiment/DeveloperProcess.js');
 
 const {
+    swbRelevantChange,
     dayOfWeekSentiment,
     sentimentByType,
     worstAndTheBest,
@@ -180,6 +181,17 @@ async function init() {
             next();
         }).catch(e => {
             logger.error('API', e);
+            res.send(404, 'not found');
+        });
+    });
+    server.get('/reports/swb-relevant', function(req, res, next) {
+        return swbRelevantChange({
+            _project: ObjectId(req.query._project)
+        }).then(r => {
+            res.send(r);
+            next();
+        }).catch(e => {
+            logger.error('api', e);
             res.send(404, 'not found');
         });
     });

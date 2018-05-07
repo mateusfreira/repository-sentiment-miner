@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Promise from 'bluebird';
 
 class CommitMiner {
   constructor(domain) {
@@ -60,6 +61,12 @@ class CommitMiner {
   getOnceContributors(project) {
     return axios.get(
       `http://${this.domain}:8081/reports/once-contributors?_project=${project}`
+    );
+  }
+
+  getSwb(project) {
+    return axios.get(
+      `http://${this.domain}:8081/reports/swb-relevant?_project=${project}`
     );
   }
 }

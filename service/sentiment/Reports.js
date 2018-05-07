@@ -114,19 +114,51 @@ class Reports {
             }),
         });
     }
-
-    swbRelevantChange(project) {
-        return Developers.find({
-            [`swb.${project}`]: {
+    swbRelevantChange(query) {
+        const project = query._project;
+        const hour = 2;
+        const swbKey = `swb.${hour}.${project}`;
+        const filter = {
+            [swbKey]: {
                 $exists: true
             }
-        }).then(devs => {
-            return devs.map((dev) => dev.swb[project])
-                .map(dev => Object.keys(dev).map(key => dev[key]))
-                .reduce((agg, current) => agg.concat(current), [])
-                .reduce((agg, current) => agg.concat(current), []);
+        };
+        return Developer.find(filter).lean().then(devs => {
+            return {
+                2: getSwbReportData(getSwbList(devs, 2, project)),
+                4: getSwbReportData(getSwbList(devs, 4, project)),
+                8: getSwbReportData(getSwbList(devs, 8, project)),
+                16: getSwbReportData(getSwbList(devs, 16, project)),
+            }
         });
     }
+}
+
+function getSwbReportData(data) {
+    const onlyComment = data.filter(swb => swb.entity === 'comment');
+    return {
+        general: getRelevantChange(onlyComment, () => true),
+        positive: getRelevantChange(onlyComment, swb => swb.commentSentiment > 0),
+        negative: getRelevantChange(onlyComment, swb => swb.commentSentiment < 0),
+    };
+}
+
+function getSwbList(devs, hour, project) {
+    const swbKey = `swb.${hour}.${project}`;
+    return _.map(devs, swbKey)
+        .map(dev => Object.keys(dev).map(key => dev[key]))
+        .reduce((agg, current) => agg.concat(current), [])
+        .reduce((agg, current) => agg.concat(current), []);
+}
+
+function getRelevantChange(data, filter) {
+    const filteredData = data.filter(filter);
+    const relevantChange = filteredData.filter(swb => swb.result >= 1 || swb.result <= -1);
+    return {
+        total: filteredData.length,
+        changed: relevantChange.length,
+        percent: relevantChange.length / filteredData.length
+    };
 }
 
 module.exports = new Reports();

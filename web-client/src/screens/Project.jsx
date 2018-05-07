@@ -35,7 +35,82 @@ function getPieChartData(
     ]
   };
 }
-
+function getSWBChartData(data) {
+  return {
+    labels: ['2 hours', '4 hours', '8 hours', '16 hours'],
+    datasets: [
+      {
+        label: 'General',
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: 'blue',
+        borderColor: 'blue',
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: 'red',
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: 'blue',
+        pointHoverBorderColor: 'blue',
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data: Object.keys(data)
+          .map(key => data[key].general.percent)
+          .map(a => parseFloat((a * 100).toFixed(2)))
+      },
+      {
+        label: 'Positive comments',
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: 'green',
+        borderColor: 'green',
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: 'green',
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: 'green',
+        pointHoverBorderColor: 'green',
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data: Object.keys(data)
+          .map(key => data[key].positive.percent)
+          .map(a => parseFloat((a * 100).toFixed(2)))
+      },
+      {
+        label: 'Negative comments',
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: 'red',
+        borderColor: 'red',
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: 'red',
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: 'gray',
+        pointHoverBorderColor: 'gray',
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data: Object.keys(data)
+          .map(key => data[key].negative.percent)
+          .map(a => parseFloat((a * 100).toFixed(2)))
+      }
+    ]
+  };
+}
 function getLineChartData(data) {
   const totals = _.chain(data)
     .values()
@@ -209,6 +284,7 @@ class ProjectPage extends React.Component {
     this.classes = props.classes;
     this.projectName = props.match.params.projectId;
     this.state = {
+      swb: {},
       worst: [],
       sentimentals: [],
       bests: [],
@@ -298,6 +374,12 @@ class ProjectPage extends React.Component {
       this.service.getWeekDayeReport(this.projectName).then(({ data }) => {
         this.setState({
           lineChartData: getLineChartData(data)
+        });
+      });
+
+      this.service.getSwb(this.projectName).then(({ data }) => {
+        this.setState({
+          swb: getSWBChartData(data)
         });
       });
 
@@ -441,6 +523,13 @@ class ProjectPage extends React.Component {
             </TableBody>
           </Table>
         </div>
+        <div>
+          <span style={{ width: '100%', float: 'left' }}>
+            <h2> SWB in time </h2>
+            <Line height="50" data={this.state.swb} />
+          </span>
+        </div>
+
         <div
           style={{
             'border-rigth': '1px solid gray',
