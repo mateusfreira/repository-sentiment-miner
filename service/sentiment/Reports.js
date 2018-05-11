@@ -152,13 +152,25 @@ function getSwbList(devs, hour, project) {
 }
 
 function getRelevantChange(data, filter) {
-    const filteredData = data.filter(filter);
-    const relevantChange = filteredData.filter(swb => swb.result >= 1 || swb.result <= -1);
+    const filteredData = data.filter(filter).filter(filterDetectable);
+    const relevantChange = filteredData.filter(filterRelevantChange);
     return {
         total: filteredData.length,
         changed: relevantChange.length,
         percent: relevantChange.length / filteredData.length
     };
+}
+
+function filterRelevantChange(swb) {
+    return swb.result >= 1 || swb.result <= -1;
+}
+
+function filterDetectable(swb) {
+    return hasInteraction(swb.swbBeforeComments) && hasInteraction(swb.swbAfterComments);
+}
+
+function hasInteraction(swbTime) {
+    return Object.keys(swbTime).some(key => swbTime[key] > 0);
 }
 
 module.exports = new Reports();
