@@ -4,6 +4,7 @@ import Promise from 'bluebird';
 import axios from 'axios';
 import { Pie, Line, Bar } from 'react-chartjs-2';
 import CommitMiner from '../services/CommitMiner.js';
+import ComparativeChart from './widgets/ComparativeChart.jsx';
 /* UI Components */
 import {
   Table,
@@ -201,82 +202,6 @@ function getLineChartData(data) {
     ]
   };
 }
-function getComparativeChart(self, sentimentData, generalData) {
-  const data = {
-    labels: ['Comments', 'Reviews', 'Commits'],
-    datasets: [
-      {
-        label: 'Negative Mean',
-        type: 'line',
-        data: [
-          generalData.comments.negative,
-          generalData.reviews.negative,
-          generalData.commits.negative
-        ],
-        fill: false,
-        borderColor: '#EC932F',
-        backgroundColor: '#EC932F',
-        pointBorderColor: '#EC932F',
-        pointBackgroundColor: '#EC932F',
-        pointHoverBackgroundColor: '#EC932F',
-        pointHoverBorderColor: '#EC932F',
-        yAxisID: 'y-axis-2'
-      },
-      {
-        label: 'Positive Mean',
-        type: 'line',
-        data: [
-          generalData.comments.positive,
-          generalData.reviews.positive,
-          generalData.commits.positive
-        ],
-        fill: false,
-        borderColor: '#006400',
-        backgroundColor: '#006400',
-        pointBorderColor: '#006400',
-        pointBackgroundColor: '#006400',
-        pointHoverBackgroundColor: '#006400',
-        pointHoverBorderColor: '#006400',
-        yAxisID: 'y-axis-2'
-      },
-
-      {
-        type: 'bar',
-        label: 'Positive',
-        data: [
-          sentimentData.comments.positive,
-          sentimentData.reviews.positive,
-          sentimentData.commits.positive
-        ],
-        fill: false,
-        backgroundColor: '#71B37C',
-        borderColor: '#71B37C',
-        hoverBackgroundColor: '#71B37C',
-        hoverBorderColor: '#71B37C',
-        yAxisID: 'y-axis-1'
-      },
-      {
-        type: 'bar',
-        label: 'Negative',
-        data: [
-          sentimentData.comments.negative,
-          sentimentData.reviews.negative,
-          sentimentData.commits.negative
-        ],
-        fill: false,
-        backgroundColor: 'red',
-        borderColor: 'red',
-        hoverBackgroundColor: 'red',
-        hoverBorderColor: 'red',
-        yAxisID: 'y-axis-1'
-      }
-    ]
-  };
-  self.state.comparative.data = data;
-  return self.setState({
-    comparative: self.state.comparative
-  });
-}
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
@@ -289,63 +214,6 @@ class ProjectPage extends React.Component {
       sentimentals: [],
       bests: [],
       onceContributors: {},
-      comparative: {
-        data: [],
-        options: {
-          responsive: true,
-          tooltips: {
-            mode: 'label'
-          },
-          elements: {
-            line: {
-              fill: false
-            }
-          },
-          scales: {
-            xAxes: [
-              {
-                display: true,
-                gridLines: {
-                  display: false
-                }
-                /*
-                        labels: {
-                            show: true
-                        }*/
-              }
-            ],
-            yAxes: [
-              {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                id: 'y-axis-1',
-                gridLines: {
-                  display: false
-                }
-                /*
-                            labels: {
-                                show: true
-                            }*/
-              },
-              {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                id: 'y-axis-2',
-                gridLines: {
-                  display: false
-                }
-                /*
-                            labels: {
-                                show: true
-                            }*/
-              }
-            ]
-          }
-        },
-        plugins: {}
-      },
       project: {
         commits: []
       },
@@ -359,18 +227,6 @@ class ProjectPage extends React.Component {
   componentDidMount() {
     const self = this;
     const updateProjectStatus = () => {
-      Promise.props({
-        project: this.service.getInteractionsReport(this.projectName),
-        general: this.service.getInteractionsReport()
-      }).then(({ project, general }) => {
-        getComparativeChart(this, project.data, general.data);
-        this.setState({
-          chartData: getPieChartData(project.data.comments),
-          reviewChartData: getPieChartData(project.data.reviews),
-          commitsChartData: getPieChartData(project.data.commits)
-        });
-      });
-
       this.service.getWeekDayeReport(this.projectName).then(({ data }) => {
         this.setState({
           lineChartData: getLineChartData(data)
@@ -428,28 +284,7 @@ class ProjectPage extends React.Component {
           {' '}
           {this.state.project.full_name} ({this.state.project.language})
         </h2>
-        <div style={{ width: '100%', float: 'left' }}>
-          <h2> Comparative </h2>
-          <Bar
-            data={this.state.comparative.data}
-            height={50}
-            options={this.state.comparative.options}
-            plugins={this.state.comparative.plugins}
-            nredraw={true}
-          />
-        </div>
-        <div style={{ width: '33%', float: 'left' }}>
-          <h2> Comments </h2>
-          <Pie data={this.state.chartData} nredraw={true} />
-        </div>
-        <div style={{ width: '33%', float: 'left' }}>
-          <h2>Reviews</h2>
-          <Pie data={this.state.reviewChartData} nredraw={true} />
-        </div>
-        <div style={{ width: '33%', float: 'left' }}>
-          <h2> Commits </h2>
-          <Pie data={this.state.commitsChartData} nredraw={true} />
-        </div>
+        <ComparativeChart project={this.props.match.params.projectId} />
         <div>
           <span style={{ width: '49%', float: 'left' }}>
             <h2> Sentiment by weekday </h2>
