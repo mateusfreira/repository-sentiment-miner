@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Pie, Line, Bar } from 'react-chartjs-2';
 import CommitMiner from '../services/CommitMiner.js';
 import ComparativeChart from './widgets/ComparativeChart.jsx';
+import SentimentByWeekday from './widgets/SentimentByWeekday.jsx';
 /* UI Components */
 import {
   Table,
@@ -112,96 +113,6 @@ function getSWBChartData(data) {
     ]
   };
 }
-function getLineChartData(data) {
-  const totals = _.chain(data)
-    .values()
-    .flatten()
-    .groupBy('_id')
-    .mapValues(d => d.reduce((c, a) => a.count + c, 0))
-    .value();
-  return {
-    labels: [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday'
-    ],
-    datasets: [
-      {
-        label: 'Negative comments',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'red',
-        borderColor: 'red',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'red',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'red',
-        pointHoverBorderColor: 'red',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: _.sortBy(data.negative, '_id')
-          .map(i => i.count / totals[i._id])
-          .map(a => parseFloat((a * 100).toFixed(2)))
-      },
-      {
-        label: 'Positive comments',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'green',
-        borderColor: 'green',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'green',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'green',
-        pointHoverBorderColor: 'green',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: _.sortBy(data.positive, '_id')
-          .map(i => i.count / totals[i._id])
-          .map(a => parseFloat((a * 100).toFixed(2)))
-      },
-      {
-        label: 'Neutral comments',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'gray',
-        borderColor: 'gray',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'gray',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'gray',
-        pointHoverBorderColor: 'gray',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: _.sortBy(data.neutral, '_id')
-          .map(i => i.count / totals[i._id])
-          .map(a => parseFloat((a * 100).toFixed(2)))
-      }
-    ]
-  };
-}
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
@@ -227,12 +138,6 @@ class ProjectPage extends React.Component {
   componentDidMount() {
     const self = this;
     const updateProjectStatus = () => {
-      this.service.getWeekDayeReport(this.projectName).then(({ data }) => {
-        this.setState({
-          lineChartData: getLineChartData(data)
-        });
-      });
-
       this.service.getSwb(this.projectName).then(({ data }) => {
         this.setState({
           swb: getSWBChartData(data)
@@ -285,12 +190,7 @@ class ProjectPage extends React.Component {
           {this.state.project.full_name} ({this.state.project.language})
         </h2>
         <ComparativeChart project={this.props.match.params.projectId} />
-        <div>
-          <span style={{ width: '49%', float: 'left' }}>
-            <h2> Sentiment by weekday </h2>
-            <Line height="50" data={this.state.lineChartData} />
-          </span>
-        </div>
+        <SentimentByWeekday project={this.props.match.params.projectId} />
         <div
           style={{
             'border-left': '1px solid gray',
