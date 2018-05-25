@@ -14,24 +14,9 @@ import {
 } from 'material-ui/Table';
 import { Bar, Pie } from 'react-chartjs-2';
 
-function getPieChartData(
-  data,
-  labels = ['Positive', 'Neutral', 'Negative'],
-  backgroundColor = ['green', 'gray', 'red']
-) {
-  return {
-    labels,
-    datasets: [
-      {
-        data: !_.isArray(data)
-          ? [data.positive, data.neutral, data.negative]
-          : data,
-        backgroundColor,
-        hoverBackgroundColor: backgroundColor
-      }
-    ]
-  };
-}
+import Util from './Util.js';
+const { getPieChartData } = Util;
+
 class MostSentimentalDevelopers extends React.Component {
   constructor(props) {
     super(props);

@@ -3,25 +3,9 @@ import _ from 'lodash';
 import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import CommitMiner from '../../services/CommitMiner.js';
+import Util from './Util.js';
 
-function getPieChartData(
-  data,
-  labels = ['Positive', 'Neutral', 'Negative'],
-  backgroundColor = ['green', 'gray', 'red']
-) {
-  return {
-    labels,
-    datasets: [
-      {
-        data: !_.isArray(data)
-          ? [data.positive, data.neutral, data.negative]
-          : data,
-        backgroundColor,
-        hoverBackgroundColor: backgroundColor
-      }
-    ]
-  };
-}
+const { getPieChartData } = Util;
 
 function getComparativeChart(sentimentData, generalData) {
   return {
