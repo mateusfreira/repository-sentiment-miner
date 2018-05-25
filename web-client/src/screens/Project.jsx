@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import Promise from 'bluebird';
-import axios from 'axios';
-import { Pie, Line, Bar } from 'react-chartjs-2';
+
 import CommitMiner from '../services/CommitMiner.js';
 import ComparativeChart from './widgets/ComparativeChart.jsx';
 import OnceContributors from './widgets/OnceContributors.jsx';
@@ -11,28 +9,6 @@ import MostSentimental from './widgets/MostSentimental.jsx';
 import MostSentimentalDevelopers from './widgets/MostSentimentalDevelopers.jsx';
 import SubjectivWeellBeing from './widgets/SubjectivWeellBeing.jsx';
 
-import CircularProgress from 'material-ui/CircularProgress';
-import GridCard from '../components/GridCard.jsx';
-import Snackbar from 'material-ui/Snackbar';
-
-function getPieChartData(
-  data,
-  labels = ['Positive', 'Neutral', 'Negative'],
-  backgroundColor = ['green', 'gray', 'red']
-) {
-  return {
-    labels,
-    datasets: [
-      {
-        data: !_.isArray(data)
-          ? [data.positive, data.neutral, data.negative]
-          : data,
-        backgroundColor,
-        hoverBackgroundColor: backgroundColor
-      }
-    ]
-  };
-}
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);

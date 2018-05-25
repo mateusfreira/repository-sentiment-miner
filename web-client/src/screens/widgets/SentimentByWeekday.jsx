@@ -1,8 +1,7 @@
-import Promise from 'bluebird';
-import _ from 'lodash';
 import React from 'react';
+import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
-import CommitMiner from '../../services/CommitMiner.js';
+import AbstractComponent from './AbstractComponent.jsx';
 
 function getLineChartData(data) {
   const totals = _.chain(data)
@@ -95,20 +94,23 @@ function getLineChartData(data) {
   };
 }
 
-class SentimentByWeekday extends React.Component {
+class SentimentByWeekday extends AbstractComponent {
   constructor(props) {
     super(props);
     this.state = {};
-    this.service = new CommitMiner(window.location.hostname);
   }
-  componentDidMount() {
-    this.service.getWeekDayeReport(this.props.project).then(({ data }) => {
-      this.setState({
-        lineChartData: getLineChartData(data)
+
+  loadData() {
+    return this.service
+      .getWeekDayeReport(this.props.project)
+      .then(({ data }) => {
+        this.setState({
+          lineChartData: getLineChartData(data)
+        });
       });
-    });
   }
-  render() {
+
+  renderAfterLoad() {
     return (
       <div>
         <span style={{ width: '49%', float: 'left' }}>

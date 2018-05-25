@@ -1,8 +1,8 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import React from 'react';
-import CommitMiner from '../../services/CommitMiner.js';
 import { Line } from 'react-chartjs-2';
+import AbstractComponent from './AbstractComponent.jsx';
 
 function getSWBChartData(data) {
   return {
@@ -81,10 +81,9 @@ function getSWBChartData(data) {
   };
 }
 
-class SubjectivWeellBeing extends React.Component {
+class SubjectivWeellBeing extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.service = new CommitMiner(window.location.hostname);
     this.state = {
       worst: [],
       best: []
@@ -96,7 +95,7 @@ class SubjectivWeellBeing extends React.Component {
     });
   }
 
-  render() {
+  renderAfterLoad() {
     return (
       <div>
         <span style={{ width: '100%', float: 'left' }}>

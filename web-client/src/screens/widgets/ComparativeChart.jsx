@@ -4,7 +4,7 @@ import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import CommitMiner from '../../services/CommitMiner.js';
 import Util from './Util.js';
-
+import AbstractComponent from './AbstractComponent.jsx';
 const { getPieChartData } = Util;
 
 function getComparativeChart(sentimentData, generalData) {
@@ -80,7 +80,7 @@ function getComparativeChart(sentimentData, generalData) {
   };
 }
 
-class ComparativeChart extends React.Component {
+class ComparativeChart extends AbstractComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -131,10 +131,6 @@ class ComparativeChart extends React.Component {
                 gridLines: {
                   display: false
                 }
-                /*
-                                          labels: {
-                                              show: true
-                                          }*/
               }
             ]
           }
@@ -142,10 +138,10 @@ class ComparativeChart extends React.Component {
         plugins: {}
       }
     };
-    this.service = new CommitMiner(window.location.hostname);
   }
-  componentDidMount() {
-    Promise.props({
+
+  loadData() {
+    return Promise.props({
       project: this.service.getInteractionsReport(this.props.project),
       general: this.service.getInteractionsReport()
     }).then(({ project, general }) => {
@@ -161,7 +157,7 @@ class ComparativeChart extends React.Component {
       });
     });
   }
-  render() {
+  renderAfterLoad() {
     return (
       <div style={{ width: '100%', float: 'left' }}>
         <h2> Comparative </h2>

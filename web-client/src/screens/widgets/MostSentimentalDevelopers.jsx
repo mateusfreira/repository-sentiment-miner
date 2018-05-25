@@ -1,7 +1,6 @@
-import Promise from 'bluebird';
 import _ from 'lodash';
 import React from 'react';
-import CommitMiner from '../../services/CommitMiner.js';
+import AbstractComponent from './AbstractComponent.jsx';
 
 /* UI Components */
 import {
@@ -17,10 +16,9 @@ import { Bar, Pie } from 'react-chartjs-2';
 import Util from './Util.js';
 const { getPieChartData } = Util;
 
-class MostSentimentalDevelopers extends React.Component {
+class MostSentimentalDevelopers extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.service = new CommitMiner(window.location.hostname);
     this.state = {
       sentimentals: []
     };
@@ -33,7 +31,7 @@ class MostSentimentalDevelopers extends React.Component {
     });
   }
 
-  render() {
+  renderAfterLoad() {
     return (
       <div
         style={{

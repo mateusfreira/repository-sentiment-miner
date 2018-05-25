@@ -41,7 +41,6 @@ class ProjectTable extends Component {
     this.service
       .getProjectList()
       .then(({ data }) => {
-        //data.filter(p => p.percent != 100).forEach(_.partial(updateProjectState, _, data, this));
         this.setState({
           projects: data
         });

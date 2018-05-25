@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import React from 'react';
 import CommitMiner from '../../services/CommitMiner.js';
+import AbstractComponent from './AbstractComponent.jsx';
 
 /* UI Components */
 import {
@@ -14,22 +15,21 @@ import {
 } from 'material-ui/Table';
 import { Bar, Pie } from 'react-chartjs-2';
 
-class MostSentimental extends React.Component {
+class MostSentimental extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.service = new CommitMiner(window.location.hostname);
     this.state = {
       worst: [],
       best: []
     };
   }
-  componentWillMount() {
-    this.service.getWrostAndBest(this.props.project).then(({ data }) => {
+  loadData() {
+    return this.service.getWrostAndBest(this.props.project).then(({ data }) => {
       this.setState({ worst: data.worst, best: data.bests });
     });
   }
 
-  render() {
+  renderAfterLoad() {
     return (
       <span>
         <div

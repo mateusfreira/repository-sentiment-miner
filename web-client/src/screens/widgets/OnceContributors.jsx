@@ -3,26 +3,28 @@ import _ from 'lodash';
 import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import CommitMiner from '../../services/CommitMiner.js';
+import AbstractComponent from './AbstractComponent.jsx';
 
 import Util from './Util.js';
 const { getPieChartData } = Util;
 
-class OnceContributors extends React.Component {
+class OnceContributors extends AbstractComponent {
   constructor(props) {
     super(props);
     this.state = {
       onceContributors: {}
     };
-    this.service = new CommitMiner(window.location.hostname);
   }
-  componentDidMount() {
-    this.service.getOnceContributors(this.props.project).then(({ data }) => {
-      this.setState({
-        onceContributors: data
+  loadData() {
+    return this.service
+      .getOnceContributors(this.props.project)
+      .then(({ data }) => {
+        this.setState({
+          onceContributors: data
+        });
       });
-    });
   }
-  render() {
+  renderAfterLoad() {
     return (
       <div
         style={{
