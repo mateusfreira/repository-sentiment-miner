@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Pie, Line, Bar } from 'react-chartjs-2';
 import CommitMiner from '../services/CommitMiner.js';
 import ComparativeChart from './widgets/ComparativeChart.jsx';
+import OnceContributors from './widgets/OnceContributors.jsx';
 import SentimentByWeekday from './widgets/SentimentByWeekday.jsx';
 /* UI Components */
 import {
@@ -124,7 +125,6 @@ class ProjectPage extends React.Component {
       worst: [],
       sentimentals: [],
       bests: [],
-      onceContributors: {},
       project: {
         commits: []
       },
@@ -159,12 +159,6 @@ class ProjectPage extends React.Component {
           sentimentals: data
         });
       });
-
-      this.service.getOnceContributors(this.projectName).then(({ data }) => {
-        this.setState({
-          onceContributors: data
-        });
-      });
     };
     updateProjectStatus();
     this.setState({
@@ -191,27 +185,7 @@ class ProjectPage extends React.Component {
         </h2>
         <ComparativeChart project={this.props.match.params.projectId} />
         <SentimentByWeekday project={this.props.match.params.projectId} />
-        <div
-          style={{
-            'border-left': '1px solid gray',
-            'border-top': '1px solid gray',
-            width: '49%',
-            float: 'left'
-          }}
-        >
-          <h2> Contributors </h2>
-          <Pie
-            data={getPieChartData(
-              [
-                this.state.onceContributors.once,
-                this.state.onceContributors.moreThanOnce
-              ],
-              ['Once', 'More than once'],
-              ['gray', 'green']
-            )}
-            nredraw={true}
-          />
-        </div>
+        <OnceContributors project={this.props.match.params.projectId} />
         <div
           style={{
             'border-rigth': '1px solid gray',
