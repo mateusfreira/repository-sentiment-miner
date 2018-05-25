@@ -7,15 +7,8 @@ import CommitMiner from '../services/CommitMiner.js';
 import ComparativeChart from './widgets/ComparativeChart.jsx';
 import OnceContributors from './widgets/OnceContributors.jsx';
 import SentimentByWeekday from './widgets/SentimentByWeekday.jsx';
-/* UI Components */
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn
-} from 'material-ui/Table';
+import MostSentimental from './widgets/MostSentimental.jsx';
+import MostSentimentalDevelopers from './widgets/MostSentimentalDevelopers.jsx';
 import CircularProgress from 'material-ui/CircularProgress';
 import GridCard from '../components/GridCard.jsx';
 import Snackbar from 'material-ui/Snackbar';
@@ -122,9 +115,6 @@ class ProjectPage extends React.Component {
     this.projectName = props.match.params.projectId;
     this.state = {
       swb: {},
-      worst: [],
-      sentimentals: [],
-      bests: [],
       project: {
         commits: []
       },
@@ -144,19 +134,9 @@ class ProjectPage extends React.Component {
         });
       });
 
-      this.service.getWrostAndBest(this.projectName).then(({ data }) => {
-        this.setState({ worst: data.worst, bests: data.bests });
-      });
-
       this.service.getProjectState(this.projectName).then(({ data }) => {
         this.setState({
           project: data
-        });
-      });
-
-      this.service.getMostSentimental(this.projectName).then(({ data }) => {
-        this.setState({
-          sentimentals: data
         });
       });
     };
@@ -186,52 +166,7 @@ class ProjectPage extends React.Component {
         <ComparativeChart project={this.props.match.params.projectId} />
         <SentimentByWeekday project={this.props.match.params.projectId} />
         <OnceContributors project={this.props.match.params.projectId} />
-        <div
-          style={{
-            'border-rigth': '1px solid gray',
-            'border-bottom': '1px solid gray',
-            width: '49%',
-            float: 'left'
-          }}
-        >
-          <Table>
-            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-              <TableRow>
-                <TableHeaderColumn>Most negative comments</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.worst.map((comment, idx) => (
-                <TableRow key={idx}>
-                  <TableRowColumn>{comment.body}</TableRowColumn>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div
-          style={{
-            'border-left': '1px solid gray',
-            'border-bottom': '1px solid gray',
-            width: '49%',
-            float: 'left'
-          }}
-        >
-          <Table>
-            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-              <TableRow>
-                <TableHeaderColumn>Most positive comments</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.bests.map((comment, idx) => (
-                <TableRow key={idx}>
-                  <TableRowColumn>{comment.body}</TableRowColumn>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <MostSentimental project={this.props.match.params.projectId} />
         <div>
           <span style={{ width: '100%', float: 'left' }}>
             <h2> SWB in time </h2>
@@ -239,49 +174,9 @@ class ProjectPage extends React.Component {
           </span>
         </div>
 
-        <div
-          style={{
-            'border-rigth': '1px solid gray',
-            width: '49%',
-            float: 'left'
-          }}
-        >
-          <Table>
-            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-              <TableRow>
-                <TableHeaderColumn>
-                  Most sentimental developers
-                </TableHeaderColumn>
-                <TableHeaderColumn>Sentiment distribution</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.sentimentals.map((developer, idx) => (
-                <TableRow key={idx}>
-                  <TableRowColumn style={{ width: '30%' }}>
-                    {developer.value.login}
-                  </TableRowColumn>
-                  <TableRowColumn>
-                    <Pie
-                      data={getPieChartData({
-                        positive:
-                          developer.contribuitions.comments.sentiment.geral
-                            .positive || 0,
-                        neutral:
-                          developer.contribuitions.comments.sentiment.geral
-                            .neutral || 0,
-                        negative:
-                          developer.contribuitions.comments.sentiment.geral
-                            .negative || 0
-                      })}
-                      nredraw={true}
-                    />
-                  </TableRowColumn>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <MostSentimentalDevelopers
+          project={this.props.match.params.projectId}
+        />
       </span>
     );
   }
