@@ -1,5 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { RECEIVE_PROJECTS } from '../redux/actions';
 
 import CommitMiner from '../services/CommitMiner.js';
 import ComparativeChart from './widgets/ComparativeChart.jsx';
@@ -16,23 +19,6 @@ class ProjectPage extends React.Component {
     this.classes = props.classes;
     this.project = props.match.params.projectId;
     this.state = { project: {} };
-  }
-
-  componentWillMount() {
-    const self = this;
-    this.service.getProjectState(this.project).then(({ data }) => {
-      this.setState({
-        project: data
-      });
-    });
-    this.setState({
-      update: true
-    });
-  }
-  componentWillUnmount() {
-    this.setState({
-      update: false
-    });
   }
 
   render() {
@@ -54,5 +40,18 @@ class ProjectPage extends React.Component {
     );
   }
 }
+const mapStateToProps = function(state) {
+  return {
+    projects: state.projects
+  };
+};
 
-export default ProjectPage;
+const mapDispatchToProps = function(dispatch) {
+  return bindActionCreators(
+    {
+      RECEIVE_PROJECTS
+    },
+    dispatch
+  );
+};
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectPage);

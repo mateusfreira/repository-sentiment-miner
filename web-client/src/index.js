@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './screens/App.jsx';
+import { Provider } from 'react-redux';
+import store from './redux/store/index.js';
+import { fetchProjects } from './redux/actions/index.js';
 import registerServiceWorker from './config/registerServiceWorker';
 import { injectGlobal } from 'styled-components';
 
@@ -17,6 +20,11 @@ injectGlobal([
   }
 `
 ]);
-
-ReactDOM.render(<App />, document.getElementById('root'));
+store.dispatch(fetchProjects()).then(console.log);
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 registerServiceWorker();

@@ -70,4 +70,7 @@ class CommitMiner {
     );
   }
 }
+CommitMiner.createService = function() {
+  return new CommitMiner(window.location.hostname);
+};
 export default CommitMiner;

@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { RECEIVE_PROJECTS } from '../redux/actions';
+
 import swal from 'sweetalert2';
 import styled from 'styled-components';
 import CommitMiner from '../services/CommitMiner.js';
@@ -27,16 +32,29 @@ function updateProjectState(project, projects, component) {
       })
     );
 }
+const mapStateToProps = function(state) {
+  return {
+    projects: state.projects
+  };
+};
+
+const mapDispatchToProps = function(dispatch) {
+  return bindActionCreators(
+    {
+      RECEIVE_PROJECTS
+    },
+    dispatch
+  );
+};
 
 class ProjectTable extends Component {
   constructor(props) {
     super(props);
+    console.log(props, 'here ');
     this.service = new CommitMiner(window.location.hostname);
     this.classes = props.classes;
-    this.state = {
-      projects: []
-    };
   }
+  /*
   componentDidMount() {
     this.service
       .getProjectList()
@@ -52,7 +70,7 @@ class ProjectTable extends Component {
           'error'
         );
       });
-  }
+  }*/
 
   loadProject(rowNum) {
     const name = this.state.projects[rowNum]._id;
@@ -76,9 +94,10 @@ class ProjectTable extends Component {
     );
   }
   render() {
+    console.log('render');
     return (
       <GridCard>
-        {this.state.projects.length ? (
+        {this.props.projecs && this.props.projecs.length ? (
           <Table onCellClick={rowNum => this.loadProject(rowNum)}>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
               <TableRow>
@@ -89,7 +108,7 @@ class ProjectTable extends Component {
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.projects.map((project, idx) => (
+              {this.props.projects.map((project, idx) => (
                 <ClickableRow key={`p${idx}`}>
                   <TableRowColumn>{project.name}</TableRowColumn>
                   <TableRowColumn>{project.stargazers_count}</TableRowColumn>
@@ -125,4 +144,4 @@ const StyledButton = styled(FlatButton)`
   margin-top: 12px !important;
 `;
 
-export default ProjectTable;
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectTable);
