@@ -23,12 +23,14 @@ class MostSentimentalDevelopers extends AbstractComponent {
       sentimentals: []
     };
   }
-  componentWillMount() {
-    this.service.getMostSentimental(this.props.project).then(({ data }) => {
-      this.setState({
-        sentimentals: data
+  loadData() {
+    return this.service
+      .getMostSentimental(this.props.project)
+      .then(({ data }) => {
+        this.setState({
+          sentimentals: data
+        });
       });
-    });
   }
 
   renderAfterLoad() {

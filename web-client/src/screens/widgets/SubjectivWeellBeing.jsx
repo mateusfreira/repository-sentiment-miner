@@ -89,8 +89,8 @@ class SubjectivWeellBeing extends AbstractComponent {
       best: []
     };
   }
-  componentWillMount() {
-    this.service.getSwb(this.props.project).then(({ data }) => {
+  loadData() {
+    return this.service.getSwb(this.props.project).then(({ data }) => {
       this.setState({ swb: getSWBChartData(data) });
     });
   }
