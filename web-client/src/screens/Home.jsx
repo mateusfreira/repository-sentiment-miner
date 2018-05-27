@@ -73,7 +73,7 @@ class ProjectTable extends Component {
   }*/
 
   loadProject(rowNum) {
-    const name = this.state.projects[rowNum]._id;
+    const name = this.props.projects[rowNum]._id;
     this.props.history.push(`/project/${name}`);
   }
   changePage(name) {
