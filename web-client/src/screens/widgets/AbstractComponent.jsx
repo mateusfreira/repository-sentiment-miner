@@ -7,6 +7,7 @@ class AbstractComponent extends React.Component {
   constructor(props) {
     super(props);
     this.service = new CommitMiner(window.location.hostname);
+    this.state = {};
   }
 
   loadData() {

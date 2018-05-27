@@ -1,9 +1,9 @@
 import Service from '../../services/CommitMiner';
-
+import Promise from 'bluebird';
 export const RECEIVE_PROJECTS = 'RECEIVE_PROJECTS';
 export const RECEIVE_PROJECT = 'RECEIVE_PROJECT';
 export const FETCH_PROJECTS = 'FETCH_PROJECTS';
-
+export const RECEIVE_COMPARATIVE = 'RECEIVE_COMPARATIVE';
 const service = Service.createService();
 
 function receiveProjects(json) {
@@ -13,6 +13,7 @@ function receiveProjects(json) {
     receivedAt: Date.now()
   };
 }
+
 function receiveProject(json) {
   return {
     type: RECEIVE_PROJECT,
@@ -21,6 +22,23 @@ function receiveProject(json) {
   };
 }
 
+function receiveComparativeData(comparative) {
+  return {
+    type: RECEIVE_COMPARATIVE,
+    comparative
+  };
+}
+
+export function fetchComparativeData(projectId) {
+  return function(dispatch) {
+    return Promise.props({
+      project: service.getInteractionsReport(projectId),
+      general: service.getInteractionsReport()
+    }).then(comparative => {
+      dispatch(receiveComparativeData(comparative));
+    });
+  };
+}
 export function fetchProject(projectId) {
   return function(dispatch) {
     //Register request

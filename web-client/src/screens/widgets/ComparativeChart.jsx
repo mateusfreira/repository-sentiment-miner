@@ -5,6 +5,8 @@ import { Bar, Pie } from 'react-chartjs-2';
 import CommitMiner from '../../services/CommitMiner.js';
 import Util from './Util.js';
 import AbstractComponent from './AbstractComponent.jsx';
+import { connect } from 'react-redux';
+import { fetchComparativeData } from '../../redux/actions';
 const { getPieChartData } = Util;
 
 function getComparativeChart(sentimentData, generalData) {
@@ -79,110 +81,136 @@ function getComparativeChart(sentimentData, generalData) {
     ]
   };
 }
-
+const COMPARATIVE_CHART_OPTIONS = {
+  responsive: true,
+  tooltips: {
+    mode: 'label'
+  },
+  elements: {
+    line: {
+      fill: false
+    }
+  },
+  scales: {
+    xAxes: [
+      {
+        display: true,
+        gridLines: {
+          display: false
+        }
+        /*
+                              labels: {
+                                  show: true
+                              }*/
+      }
+    ],
+    yAxes: [
+      {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        id: 'y-axis-1',
+        gridLines: {
+          display: false
+        }
+      },
+      {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        id: 'y-axis-2',
+        gridLines: {
+          display: false
+        }
+      }
+    ]
+  }
+};
 class ComparativeChart extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      comparative: {
-        data: [],
-        options: {
-          responsive: true,
-          tooltips: {
-            mode: 'label'
-          },
-          elements: {
-            line: {
-              fill: false
-            }
-          },
-          scales: {
-            xAxes: [
-              {
-                display: true,
-                gridLines: {
-                  display: false
-                }
-                /*
-                                  labels: {
-                                      show: true
-                                  }*/
-              }
-            ],
-            yAxes: [
-              {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                id: 'y-axis-1',
-                gridLines: {
-                  display: false
-                }
-                /*
-                                          labels: {
-                                              show: true
-                                          }*/
-              },
-              {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                id: 'y-axis-2',
-                gridLines: {
-                  display: false
-                }
-              }
-            ]
-          }
-        },
-        plugins: {}
-      }
-    };
+    this.comparativeOptions = COMPARATIVE_CHART_OPTIONS;
   }
 
   loadData() {
-    return Promise.props({
-      project: this.service.getInteractionsReport(this.props.project),
-      general: this.service.getInteractionsReport()
-    }).then(({ project, general }) => {
-      Object.assign(
-        this.state.comparative.data,
-        getComparativeChart(project.data, general.data)
-      );
-      this.setState(this.state);
-      this.setState({
-        chartData: getPieChartData(project.data.comments),
-        reviewChartData: getPieChartData(project.data.reviews),
-        commitsChartData: getPieChartData(project.data.commits)
-      });
-    });
+    return this.props.dispatch(fetchComparativeData());
   }
   renderAfterLoad() {
     return (
-      <div style={{ width: '100%', float: 'left' }}>
-        <h2> Comparative </h2>
+      <div
+        style={{
+          width: '100%',
+          float: 'left'
+        }}
+      >
+        <h2> Comparative </h2>{' '}
         <Bar
-          data={this.state.comparative.data}
+          data={this.props.comparative.data}
           height={50}
-          options={this.state.comparative.options}
-          plugins={this.state.comparative.plugins}
+          options={this.comparativeOptions}
           nredraw={true}
         />
         <div style={{ width: '33%', float: 'left' }}>
-          <h2> Comments </h2>
-          <Pie data={this.state.chartData} nredraw={true} />
+          <h2>Comments </h2>
+          <Pie data={this.props.chartData} nredraw={true} />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
-          <h2>Reviews</h2>
-          <Pie data={this.state.reviewChartData} nredraw={true} />
+          <h2> Reviews </h2>
+          <Pie data={this.props.reviewChartData} nredraw={true} />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Commits </h2>
-          <Pie data={this.state.commitsChartData} nredraw={true} />
+          <Pie data={this.props.commitsChartData} nredraw={true} />
         </div>
       </div>
     );
   }
 }
+const mapStateToProps = function(state) {
+  const { project, general } = state.comparative || {
+    project: {
+      data: {
+        comments: {},
+        reviews: {},
+        commits: {}
+      }
+    },
+    general: {
+      data: {
+        comments: {},
+        reviews: {},
+        commits: {}
+      }
+    }
+  };
+  return {
+    comparative: {
+      data: getComparativeChart(project.data, general.data)
+    },
+    chartData: getPieChartData(project.data.reviews),
+    commitsChartData: getPieChartData(project.data.commits),
+    reviewChartData: getPieChartData(project.data.reviews)
+  };
+  Object.assign(
+    this.state.comparative.data,
+    getComparativeChart(project.data, general.data)
+  );
+  this.setState(this.state);
+  this.setState({
+    chartData: getPieChartData(project.data.comments),
+    reviewChartData: getPieChartData(project.data.reviews),
+    commitsChartData: getPieChartData(project.data.commits)
+  });
 
-export default ComparativeChart;
+  return {
+    comparative: state.comparative
+  };
+};
+
+const mapDispatchToProps = function(dispatch) {
+  return {
+    dispatch
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ComparativeChart);
