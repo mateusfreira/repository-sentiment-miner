@@ -4,7 +4,7 @@ const initialState = {};
 const actionsMap = {
   [RECEIVE_PROJECTS]: (state, action) =>
     Object.assign({}, state, {
-      projecs: action.projects
+      projects: action.projects
     })
 };
 const rootReducer = (state = initialState, action) => {

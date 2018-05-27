@@ -94,10 +94,10 @@ class ProjectTable extends Component {
     );
   }
   render() {
-    console.log('render');
+    const projects = this.props.projects;
     return (
       <GridCard>
-        {this.props.projecs && this.props.projecs.length ? (
+        {projects && projects.length ? (
           <Table onCellClick={rowNum => this.loadProject(rowNum)}>
             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
               <TableRow>
@@ -108,7 +108,7 @@ class ProjectTable extends Component {
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.props.projects.map((project, idx) => (
+              {projects.map((project, idx) => (
                 <ClickableRow key={`p${idx}`}>
                   <TableRowColumn>{project.name}</TableRowColumn>
                   <TableRowColumn>{project.stargazers_count}</TableRowColumn>
