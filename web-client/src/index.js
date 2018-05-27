@@ -20,7 +20,7 @@ injectGlobal([
   }
 `
 ]);
-store.dispatch(fetchProjects()).then(console.log);
+store.dispatch(fetchProjects());
 ReactDOM.render(
   <Provider store={store}>
     <App />

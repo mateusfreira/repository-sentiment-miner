@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { RECEIVE_PROJECTS } from '../redux/actions';
@@ -11,22 +12,22 @@ import SentimentByWeekday from './widgets/SentimentByWeekday.jsx';
 import MostSentimental from './widgets/MostSentimental.jsx';
 import MostSentimentalDevelopers from './widgets/MostSentimentalDevelopers.jsx';
 import SubjectivWeellBeing from './widgets/SubjectivWeellBeing.jsx';
-
+import { fetchProject } from '../redux/actions/index.js';
 class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
-    this.service = new CommitMiner(window.location.hostname);
     this.classes = props.classes;
-    this.project = props.match.params.projectId;
-    this.state = { project: {} };
   }
 
+  componentWillMount() {
+    this.props.dispatch(fetchProject(this.props.match.params.projectId));
+  }
   render() {
     return (
       <span>
         <h2>
           {' '}
-          {this.state.project.full_name} ({this.state.project.language})
+          {this.props.project.full_name} ({this.props.project.language})
         </h2>
         <ComparativeChart project={this.props.match.params.projectId} />
         <SentimentByWeekday project={this.props.match.params.projectId} />
@@ -40,18 +41,19 @@ class ProjectPage extends React.Component {
     );
   }
 }
+
+ProjectPage.defaultProps = {
+  project: {}
+};
 const mapStateToProps = function(state) {
   return {
-    projects: state.projects
+    project: state.project
   };
 };
 
 const mapDispatchToProps = function(dispatch) {
-  return bindActionCreators(
-    {
-      RECEIVE_PROJECTS
-    },
+  return {
     dispatch
-  );
+  };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectPage);

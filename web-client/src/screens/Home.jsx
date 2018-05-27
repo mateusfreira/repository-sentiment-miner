@@ -50,7 +50,6 @@ const mapDispatchToProps = function(dispatch) {
 class ProjectTable extends Component {
   constructor(props) {
     super(props);
-    console.log(props, 'here ');
     this.service = new CommitMiner(window.location.hostname);
     this.classes = props.classes;
   }
