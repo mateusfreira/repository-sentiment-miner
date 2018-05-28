@@ -53,6 +53,8 @@ class MostSentimentalDevelopers extends AbstractComponent {
             {this.state.sentimentals.map((developer, idx) => (
               <TableRow key={idx}>
                 <TableRowColumn style={{ width: '30%' }}>
+                  <img src={developer.value.avatar_url} height="100" />
+                  <br />
                   {developer.value.login}
                 </TableRowColumn>
                 <TableRowColumn>

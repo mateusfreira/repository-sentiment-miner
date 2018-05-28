@@ -9,6 +9,20 @@ import { connect } from 'react-redux';
 import { fetchComparativeData } from '../../redux/actions';
 const { getPieChartData } = Util;
 
+const emptyState = {
+  comments: {},
+  reviews: {},
+  commits: {}
+};
+
+const emptyComparative = {
+  project: {
+    data: emptyState
+  },
+  general: {
+    data: emptyState
+  }
+};
 function getComparativeChart(sentimentData, generalData) {
   return {
     labels: ['Comments', 'Reviews', 'Commits'],
@@ -98,10 +112,6 @@ const COMPARATIVE_CHART_OPTIONS = {
         gridLines: {
           display: false
         }
-        /*
-                              labels: {
-                                  show: true
-                              }*/
       }
     ],
     yAxes: [
@@ -166,23 +176,9 @@ class ComparativeChart extends AbstractComponent {
     );
   }
 }
+
 const mapStateToProps = function(state) {
-  const { project, general } = state.comparative || {
-    project: {
-      data: {
-        comments: {},
-        reviews: {},
-        commits: {}
-      }
-    },
-    general: {
-      data: {
-        comments: {},
-        reviews: {},
-        commits: {}
-      }
-    }
-  };
+  const { project, general } = state.comparative || emptyComparative;
   return {
     comparative: {
       data: getComparativeChart(project.data, general.data)
@@ -191,26 +187,8 @@ const mapStateToProps = function(state) {
     commitsChartData: getPieChartData(project.data.commits),
     reviewChartData: getPieChartData(project.data.reviews)
   };
-  Object.assign(
-    this.state.comparative.data,
-    getComparativeChart(project.data, general.data)
-  );
-  this.setState(this.state);
-  this.setState({
-    chartData: getPieChartData(project.data.comments),
-    reviewChartData: getPieChartData(project.data.reviews),
-    commitsChartData: getPieChartData(project.data.commits)
-  });
-
-  return {
-    comparative: state.comparative
-  };
 };
 
-const mapDispatchToProps = function(dispatch) {
-  return {
-    dispatch
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ComparativeChart);
+export default connect(mapStateToProps, ComparativeChart._mapDispatchToProps)(
+  ComparativeChart
+);

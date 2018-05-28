@@ -14,11 +14,20 @@ class AbstractComponent extends React.Component {
     return Promise.reject(`Not implemented`);
   }
   componentWillMount() {
-    this.loadData().then(() => this.setState({ loaded: true }));
+    this.loadData().then(() =>
+      this.setState({
+        loaded: true
+      })
+    );
   }
+
   render() {
     return this.state.loaded ? this.renderAfterLoad() : <CircularProgress />;
   }
+  static _mapDispatchToProps(dispatch) {
+    return {
+      dispatch
+    };
+  }
 }
-
 export default AbstractComponent;
