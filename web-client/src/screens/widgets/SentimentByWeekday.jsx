@@ -3,6 +3,9 @@ import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
 import AbstractComponent from './AbstractComponent.jsx';
 
+import { connect } from 'react-redux';
+import { fetchWeekSentimentData } from '../../redux/actions';
+
 function getLineChartData(data) {
   const totals = _.chain(data)
     .values()
@@ -97,17 +100,10 @@ function getLineChartData(data) {
 class SentimentByWeekday extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = {};
   }
 
   loadData() {
-    return this.service
-      .getWeekDayeReport(this.props.project)
-      .then(({ data }) => {
-        this.setState({
-          lineChartData: getLineChartData(data)
-        });
-      });
+    return this.props.dispatch(fetchWeekSentimentData(this.props.project));
   }
 
   renderAfterLoad() {
@@ -115,11 +111,20 @@ class SentimentByWeekday extends AbstractComponent {
       <div>
         <span style={{ width: '49%', float: 'left' }}>
           <h2> Sentiment by weekday </h2>
-          <Line height="50" data={this.state.lineChartData} />
+          <Line height="50" data={this.props.weekSentiment} />
         </span>
       </div>
     );
   }
 }
 
-export default SentimentByWeekday;
+const mapStateToProps = function(state) {
+  const weekSentiment = state.weekSentiment || { negative: [], positive: [] };
+  return {
+    weekSentiment: getLineChartData(weekSentiment)
+  };
+};
+
+export default connect(mapStateToProps, SentimentByWeekday._mapDispatchToProps)(
+  SentimentByWeekday
+);

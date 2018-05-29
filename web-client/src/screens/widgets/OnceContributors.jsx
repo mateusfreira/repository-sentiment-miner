@@ -5,24 +5,18 @@ import { Bar, Pie } from 'react-chartjs-2';
 import CommitMiner from '../../services/CommitMiner.js';
 import AbstractComponent from './AbstractComponent.jsx';
 
+import { connect } from 'react-redux';
+import { fetchOnceContributors } from '../../redux/actions';
+
 import Util from './Util.js';
 const { getPieChartData } = Util;
 
 class OnceContributors extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      onceContributors: {}
-    };
   }
   loadData() {
-    return this.service
-      .getOnceContributors(this.props.project)
-      .then(({ data }) => {
-        this.setState({
-          onceContributors: data
-        });
-      });
+    return this.props.dispatch(fetchOnceContributors(this.props.project));
   }
   renderAfterLoad() {
     return (
@@ -38,8 +32,8 @@ class OnceContributors extends AbstractComponent {
         <Pie
           data={getPieChartData(
             [
-              this.state.onceContributors.once,
-              this.state.onceContributors.moreThanOnce
+              this.props.onceContributors.once,
+              this.props.onceContributors.moreThanOnce
             ],
             ['Once', 'More than once'],
             ['gray', 'green']
@@ -51,4 +45,16 @@ class OnceContributors extends AbstractComponent {
   }
 }
 
-export default OnceContributors;
+const mapStateToProps = function(state) {
+  const onceContributors = state.onceContributors || {
+    once: [],
+    moreThanOnce: []
+  };
+  return {
+    onceContributors
+  };
+};
+
+export default connect(mapStateToProps, OnceContributors._mapDispatchToProps)(
+  OnceContributors
+);

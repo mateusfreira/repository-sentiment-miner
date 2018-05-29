@@ -1,6 +1,9 @@
 import Service from '../../services/CommitMiner';
 import Promise from 'bluebird';
+
+export const RECEIVE_ONCE_CONTIBUTORS = 'RECEIVE_ONCE_CONTIBUTORS';
 export const RECEIVE_PROJECTS = 'RECEIVE_PROJECTS';
+export const RECEIVE_WEEK_SENTIMENT = 'RECEIVE_WEEK_SENTIMENT';
 export const RECEIVE_PROJECT = 'RECEIVE_PROJECT';
 export const FETCH_PROJECTS = 'FETCH_PROJECTS';
 export const RECEIVE_COMPARATIVE = 'RECEIVE_COMPARATIVE';
@@ -28,7 +31,26 @@ function receiveComparativeData(comparative) {
     comparative
   };
 }
+function receiveWeekSentiment(weekSentiment) {
+  return {
+    type: RECEIVE_WEEK_SENTIMENT,
+    weekSentiment
+  };
+}
+function receiveOnceContrinutor(onceContributors) {
+  return {
+    type: RECEIVE_ONCE_CONTIBUTORS,
+    onceContributors
+  };
+}
 
+export function fetchOnceContributors(projectId) {
+  return function(dispatch) {
+    return service.getOnceContributors(projectId).then(({ data }) => {
+      dispatch(receiveOnceContrinutor(data));
+    });
+  };
+}
 export function fetchComparativeData(projectId) {
   return function(dispatch) {
     return Promise.props({
@@ -39,6 +61,15 @@ export function fetchComparativeData(projectId) {
     });
   };
 }
+
+export function fetchWeekSentimentData(projectId) {
+  return function(dispatch) {
+    return service.getWeekDayeReport(projectId).then(({ data }) => {
+      dispatch(receiveWeekSentiment(data));
+    });
+  };
+}
+
 export function fetchProject(projectId) {
   return function(dispatch) {
     //Register request
