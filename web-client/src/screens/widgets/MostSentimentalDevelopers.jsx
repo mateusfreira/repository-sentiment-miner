@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
 import AbstractComponent from './AbstractComponent.jsx';
-
+import { connect } from 'react-redux';
+import { fetchMostSentimentalDevelopers } from '../../redux/actions';
 /* UI Components */
 import {
   Table,
@@ -19,18 +20,11 @@ const { getPieChartData } = Util;
 class MostSentimentalDevelopers extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      sentimentals: []
-    };
   }
   loadData() {
-    return this.service
-      .getMostSentimental(this.props.project)
-      .then(({ data }) => {
-        this.setState({
-          sentimentals: data
-        });
-      });
+    return this.props.dispatch(
+      fetchMostSentimentalDevelopers(this.props.project)
+    );
   }
 
   renderAfterLoad() {
@@ -50,7 +44,7 @@ class MostSentimentalDevelopers extends AbstractComponent {
             </TableRow>
           </TableHeader>
           <TableBody displayRowCheckbox={false} showRowHover={true}>
-            {this.state.sentimentals.map((developer, idx) => (
+            {this.props.sentimentals.map((developer, idx) => (
               <TableRow key={idx}>
                 <TableRowColumn style={{ width: '30%' }}>
                   <img src={developer.value.avatar_url} height="100" />
@@ -81,5 +75,12 @@ class MostSentimentalDevelopers extends AbstractComponent {
     );
   }
 }
-
-export default MostSentimentalDevelopers;
+function mapStateToProps(state) {
+  return {
+    sentimentals: state.sentimentals || []
+  };
+}
+export default connect(
+  mapStateToProps,
+  MostSentimentalDevelopers._mapDispatchToProps
+)(MostSentimentalDevelopers);

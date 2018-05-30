@@ -7,8 +7,31 @@ export const RECEIVE_WEEK_SENTIMENT = 'RECEIVE_WEEK_SENTIMENT';
 export const RECEIVE_PROJECT = 'RECEIVE_PROJECT';
 export const FETCH_PROJECTS = 'FETCH_PROJECTS';
 export const RECEIVE_COMPARATIVE = 'RECEIVE_COMPARATIVE';
+export const RECEIVE_MOST_SENTIMENTAL = 'RECEIVE_MOST_SENTIMENTAL';
+export const RECEIVE_SWB = 'RECEIVE_SWB';
+export const RECEIVE_MOST_SENTIMENTAL_DEVELOPERS =
+  'RECEIVE_MOST_SENTIMENTAL_DEVELOPERS';
 const service = Service.createService();
 
+function receiveMostSentimentalDevelopers(sentimentals) {
+  return {
+    type: RECEIVE_MOST_SENTIMENTAL_DEVELOPERS,
+    sentimentals
+  };
+}
+function receiveSWB(swb) {
+  return {
+    type: RECEIVE_SWB,
+    swb
+  };
+}
+
+function receiveMostSentimental(mostSentimental) {
+  return {
+    type: RECEIVE_MOST_SENTIMENTAL,
+    mostSentimental
+  };
+}
 function receiveProjects(json) {
   return {
     type: RECEIVE_PROJECTS,
@@ -41,6 +64,27 @@ function receiveOnceContrinutor(onceContributors) {
   return {
     type: RECEIVE_ONCE_CONTIBUTORS,
     onceContributors
+  };
+}
+export function fetchMostSentimentalDevelopers(project) {
+  return function(dispatch) {
+    return service.getMostSentimental(project).then(({ data }) => {
+      dispatch(receiveMostSentimentalDevelopers(data));
+    });
+  };
+}
+export function fetchSWB(projectId) {
+  return function(dispatch) {
+    return service.getSwb(projectId).then(({ data }) => {
+      dispatch(receiveSWB(data));
+    });
+  };
+}
+export function fetchMostSentimental(projectId) {
+  return function(dispatch) {
+    return service.getWrostAndBest(projectId).then(({ data }) => {
+      dispatch(receiveMostSentimental(data));
+    });
   };
 }
 

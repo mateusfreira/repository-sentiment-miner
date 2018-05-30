@@ -3,7 +3,8 @@ import _ from 'lodash';
 import React from 'react';
 import CommitMiner from '../../services/CommitMiner.js';
 import AbstractComponent from './AbstractComponent.jsx';
-
+import { connect } from 'react-redux';
+import { fetchMostSentimental } from '../../redux/actions';
 /* UI Components */
 import {
   Table,
@@ -18,15 +19,9 @@ import { Bar, Pie } from 'react-chartjs-2';
 class MostSentimental extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      worst: [],
-      best: []
-    };
   }
   loadData() {
-    return this.service.getWrostAndBest(this.props.project).then(({ data }) => {
-      this.setState({ worst: data.worst, best: data.bests });
-    });
+    return this.props.dispatch(fetchMostSentimental(this.props.project));
   }
 
   renderAfterLoad() {
@@ -47,7 +42,7 @@ class MostSentimental extends AbstractComponent {
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.worst.map((comment, idx) => (
+              {this.props.worst.map((comment, idx) => (
                 <TableRow key={idx}>
                   <TableRowColumn>{comment.body}</TableRowColumn>
                 </TableRow>
@@ -70,7 +65,7 @@ class MostSentimental extends AbstractComponent {
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {this.state.best.map((comment, idx) => (
+              {this.props.best.map((comment, idx) => (
                 <TableRow key={idx}>
                   <TableRowColumn>{comment.body}</TableRowColumn>
                 </TableRow>
@@ -82,5 +77,13 @@ class MostSentimental extends AbstractComponent {
     );
   }
 }
-
-export default MostSentimental;
+function mapStateToProps(state) {
+  const mostSentimental = state.mostSentimental || {};
+  return {
+    best: mostSentimental.bests || [],
+    worst: mostSentimental.worst || []
+  };
+}
+export default connect(mapStateToProps, MostSentimental._mapDispatchToProps)(
+  MostSentimental
+);
