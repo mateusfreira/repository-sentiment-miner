@@ -14,17 +14,23 @@ ENV IMAGE_USER commits
 ENV IMAGE_PASSWORD 123456
 ENV COMMITS_MINER_HOME /home/${IMAGE_USER}
 
-# add credentials on build
-ARG SSH_PRIVATE_KEY
-RUN mkdir /root/.ssh/
-RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
+ARG ssh_prv_key
+ARG ssh_pub_key
 
-# make sure your domain is accepted
-RUN touch /root/.ssh/known_hosts
-RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+# Add the keys and set permissions
+RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+    echo "$ssh_pub_key" > /root/.ssh/id_rsa.pub && \
+    chmod 600 /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa.pub
+
 
 # Install environment dependencies
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git openssh-server ibmysqlclient-dev
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash
 RUN apt-get install -y nodejs
 
@@ -42,10 +48,6 @@ RUN mkdir ${COMMITS_MINER_HOME}/.npm-global && \
     echo "export PATH=${COMMITS_MINER_HOME}/.npm-global/bin:$PATH" >> ${COMMITS_MINER_HOME}/.profile && \
     export PATH=${COMMITS_MINER_HOME}/.npm-global/bin:$PATH 
 
-# add credentials on build
-ARG SSH_PRIVATE_KEY
-RUN mkdir /root/.ssh/
-RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
 
 # make sure your domain is accepted
 RUN touch /root/.ssh/known_hosts
@@ -62,6 +64,8 @@ RUN mkdir ./www && \
     git clone ${COMMITS_MINER_REPOSITORY} && \
     npm install && \
     printf '{"mongo": {"url" : "${MONGO_DB_URL}", "opt": {"user": "${MONGO_DB_USER}", "pass": "${MONGO_DB_PASSWORD}", "auth": {"authdb": "${MONGO_DB_AUTHDB}"}}}, "github":{"tokens":["${GITHUB_TOKENS}"]}}' >> config/default.json
+# Remove SSH keys
+RUN rm -rf /root/.ssh/
 EXPOSE 8080
 WORKDIR ${COMMITS_MINER_HOME}/www/commits-miner
 CMD npm run server && \
