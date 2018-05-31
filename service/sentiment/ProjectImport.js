@@ -17,9 +17,9 @@ const {
     processDevelopersProfile
 } = require('../../service/sentiment/DeveloperProcess.js');
 
-
-const applySentiStrengthStanfordParser = require('../../../github-sentiment-analysis-code-smells-scripts/sentistrength-stanford-parser')
-    .applySentiStrengthStanfordParser;
+ const { SentiStrength } =  require('senti-strength-node');
+const sentiStrength = new SentiStrength('../github-sentiment-analysis-code-smells-scripts/sentiment');
+const applySentiStrengthStanfordParser = sentiStrength.apply.bind(sentiStrength);
 const isOffencive = require('../../../github-sentiment-analysis-code-smells-scripts/is-it-ofensive.js');
 const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, field, cp, grouped) => {
     data.forEach(interaction => {
