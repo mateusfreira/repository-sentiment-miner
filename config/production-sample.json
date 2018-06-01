@@ -1,5 +1,24 @@
 {
-  "mongo": {
-    "url": "url-to-mongo"
-  }
+    "sentiment": {
+      "senti-strength": {
+        "path": "..."
+      }
+    },
+    "mongo": {
+        "url": "...",
+        "opt": {
+            "user": "...",
+            "pass": "...",
+            "auth": {
+                "authdb": "admin"
+            }
+        }
+    },
+    "github": {
+        "tokens": [
+            "...",
+            "...",
+            "..."
+        ]
+    }
 }
