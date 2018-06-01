@@ -16,16 +16,20 @@ const { processDevelopersProfile } = require('../../service/sentiment/DeveloperP
  const { SentiStrength } =  require('senti-strength-node');
 const sentiStrength = new SentiStrength(_.get(config, 'sentiment.senti-strength.path'));
 const applySentiStrengthStanfordParser = sentiStrength.apply.bind(sentiStrength);
-const isOffencive = require('../../../github-sentiment-analysis-code-smells-scripts/is-it-ofensive.js');
-const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, field, cp, grouped) => {
-    data.forEach(interaction => {
-        interaction.offencive = isOffencive(interaction.body || interaction.message || '');
-    });
-    cp();
-}, (data, field, cp, grouped, project) => {
-    data.forEach(i => i.created_at = new Date(i.created_at))
-    cp();
-}];
+const sentimentTasks = _.get(config, 'sentiment.tasks', []);
+const sentimentTasksRunnable = sentimentTasks.map((config) => {
+    const taskClass = _.get(require(config.fileName), config.className);
+    const taskIntance = new taskClass(config.config);
+    return (interactions) => {
+        return taskIntance[config.methodName](interactions.map(interaction => interaction.body || interaction.message || ''))
+            .then((result) => {
+                interactions.forEach((interaction, i) => {
+                    interaction[config.propertyName] = result[i];
+                });
+                return interactions;
+            });
+    };
+});
 
 const pendingDevelopers = {
 
@@ -76,19 +80,19 @@ function applySentiment(data) {
         const chunks_size = 100;
         const chunks = _.chunk(data, chunks_size);
         const nPoocesses = 9;
-        async.eachLimit(chunks, nPoocesses, function(obj, callback) {
-            async.parallel(tasks.map((task) => {
-                return _.partial(task, obj, 'body');
-            }), (err) => {
-                finished++;
-                console.log(`Commits processed ${finished} / ${chunks.length}`, 'log');
-                callback(err);
-            });
+        async.eachLimit(chunks, nPoocesses, function(objs, callback) {
+            Promise.map(sentimentTasksRunnable, (task) => {
+                    return task(objs);
+                }).asCallback(callback)
+                .finally(() => {
+                    finished++;
+                    console.log(`Commits processed ${finished} / ${chunks.length}`, 'log');
+                });
         }, function(err, result) {
             if (err) return reject(err);
             return resolve(data);
-        })
-    })
+        });
+    });
 }
 
 function importProject(projectUrl) {
