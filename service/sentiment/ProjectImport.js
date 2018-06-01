@@ -10,15 +10,11 @@ const Project = models.Project;
 const PullComments = models.PullComments;
 const PullReviews = models.PullReviews;
 const Commit = models.Commit;
-const {
-    processSWB
-} = require('../../service/sentiment/SubjectiveWellBeing.js');
-const {
-    processDevelopersProfile
-} = require('../../service/sentiment/DeveloperProcess.js');
+const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
+const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
 
  const { SentiStrength } =  require('senti-strength-node');
-const sentiStrength = new SentiStrength('../github-sentiment-analysis-code-smells-scripts/sentiment');
+const sentiStrength = new SentiStrength(_.get(config, 'sentiment.senti-strength.path'));
 const applySentiStrengthStanfordParser = sentiStrength.apply.bind(sentiStrength);
 const isOffencive = require('../../../github-sentiment-analysis-code-smells-scripts/is-it-ofensive.js');
 const tasks = [_.partialRight(applySentiStrengthStanfordParser, true), (data, field, cp, grouped) => {
