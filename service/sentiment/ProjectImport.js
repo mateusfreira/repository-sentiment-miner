@@ -12,24 +12,14 @@ const PullReviews = models.PullReviews;
 const Commit = models.Commit;
 const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
 const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
-const { SentimenTask  } = require('./SentimenTask.js');
-const sentimentTasks = _.get(config, 'sentiment.tasks', []);
-const sentimentTasksRunnable = sentimentTasks.map((config) => {
-	const sentimentTask = new SentimenTask(config);
-    return (interactions) => {
-        return sentimentTask.apply(interactions.map(interaction => interaction.body || interaction.message || ''))
-            .then((result) => {
-                interactions.forEach((interaction, i) => {
-                    interaction[config.propertyName] = result[i];
-                });
-                return interactions;
-            });
-    };
-});
+const { SentimentTaskManager  } = require('./SentimentTaskManager.js');
+
+const sentimentTaskManager = new SentimentTaskManager(config);
 
 const pendingDevelopers = {
 
 };
+
 let running;
 
 function startDeveloperCreatorQueue() {
@@ -113,7 +103,7 @@ function importProject(projectUrl) {
                         gitHubUtil.getData(pull.comments_url.replace('comments', 'events'))
                     ]).spread((_comments, _reviews, _commits, _events) => {
                         const interactions = _.flatten([pull, _comments, _reviews, _commits, _events]);
-                        return applySentiment(interactions, mongoProject).then(() => Promise.map(interactions, interaction => {
+                        return sentimentTaskManager.applySentiment(interactions).then(() => Promise.map(interactions, interaction => {
                             interaction._project = mongoProject._id;
                             return checkDeveloper(interaction);
                         }).then(() => {
@@ -145,7 +135,7 @@ function importProject(projectUrl) {
                 })).then((pulls) => {
                     return project;
                 }).then(function(project) {
-                    return applySentiment(project._commits.map((c) => {
+                    return sentimentTaskManager.applySentiment(project._commits.map((c) => {
                             c.body = _.get(c, 'commit.message')
                             return c;
                         }), mongoProject)
