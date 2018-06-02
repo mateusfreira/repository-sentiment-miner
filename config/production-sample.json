@@ -1,8 +1,18 @@
 {
     "sentiment": {
-      "senti-strength": {
-        "path": "..."
-      }
+        "tasks": [{
+            "config": "__PATH_SENTISTRENG__",
+            "propertyName": "sentistrength_new",
+            "methodName": "detectSentiment",
+            "fileName": "senti-strength-node",
+            "className": "SentiStrength"
+        }, {
+            "config": {},
+            "propertyName": "sentiment_afinn",
+            "methodName": "analyze",
+            "fileName": "sentiment",
+            "stratefy": "single-sync"
+        }]
     },
     "mongo": {
         "url": "...",
