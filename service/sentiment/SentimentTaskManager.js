@@ -1,9 +1,7 @@
 const async = require('async');
 const Promise = require('bluebird');
 const _ = require('lodash');
-const {
-    SentimenTask
-} = require('./SentimenTask.js');
+const { SentimentTask } = require('./SentimentTask.js');
 class SentimentTaskManager {
     constructor(config) {
         this.config = config;
@@ -12,7 +10,7 @@ class SentimentTaskManager {
         if (!this.sentimentTasksRunnable) {
             const sentimentTasks = _.get(this.config, 'sentiment.tasks', []);
             this.sentimentTasksRunnable = sentimentTasks.map((config) => {
-                const sentimentTask = new SentimenTask(config);
+                const sentimentTask = new SentimentTask(config);
                 return (interactions) => {
                     return sentimentTask.apply(interactions.map(interaction => interaction.body || interaction.message || ''))
                         .then((result) => {
