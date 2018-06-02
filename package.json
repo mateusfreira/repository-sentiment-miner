@@ -39,6 +39,7 @@
     "redux": "^4.0.0",
     "restify": "^6.3.4",
     "senti-strength-node": "^1.0.0",
+    "sentiment": "^5.0.0",
     "should": "^13.2.1"
   },
   "devDependencies": {
