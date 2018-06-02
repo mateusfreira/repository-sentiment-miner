@@ -12,16 +12,12 @@ const PullReviews = models.PullReviews;
 const Commit = models.Commit;
 const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
 const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
-
- const { SentiStrength } =  require('senti-strength-node');
-const sentiStrength = new SentiStrength(_.get(config, 'sentiment.senti-strength.path'));
-const applySentiStrengthStanfordParser = sentiStrength.apply.bind(sentiStrength);
+const { SentimenTask  } = require('./SentimenTask.js');
 const sentimentTasks = _.get(config, 'sentiment.tasks', []);
 const sentimentTasksRunnable = sentimentTasks.map((config) => {
-    const taskClass = _.get(require(config.fileName), config.className);
-    const taskIntance = new taskClass(config.config);
+	const sentimentTask = new SentimenTask(config);
     return (interactions) => {
-        return taskIntance[config.methodName](interactions.map(interaction => interaction.body || interaction.message || ''))
+        return sentimentTask.apply(interactions.map(interaction => interaction.body || interaction.message || ''))
             .then((result) => {
                 interactions.forEach((interaction, i) => {
                     interaction[config.propertyName] = result[i];
