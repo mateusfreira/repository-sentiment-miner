@@ -1,17 +1,19 @@
-import _ from 'lodash';
 import React from 'react';
 import { connect } from 'react-redux';
-import { RECEIVE_PROJECTS } from '../redux/actions';
 
-import CommitMiner from '../services/CommitMiner.js';
-import ComparativeChart from './widgets/ComparativeChart.jsx';
-import OnceContributors from './widgets/OnceContributors.jsx';
-import SentimentByWeekday from './widgets/SentimentByWeekday.jsx';
-import MostSentimental from './widgets/MostSentimental.jsx';
-import MostSentimentalDevelopers from './widgets/MostSentimentalDevelopers.jsx';
-import SubjectivWeellBeing from './widgets/SubjectivWeellBeing.jsx';
-import { fetchProject } from '../redux/actions/index.js';
+import ComparativeChart from './widgets/ComparativeChart';
+import OnceContributors from './widgets/OnceContributors';
+import SentimentByWeekday from './widgets/SentimentByWeekday';
+import MostSentimental from './widgets/MostSentimental';
+import MostSentimentalDevelopers from './widgets/MostSentimentalDevelopers';
+import SubjectivWeellBeing from './widgets/SubjectivWeellBeing';
+import { fetchProject } from '../redux/actions/index';
+
 class ProjectPage extends React.Component {
+  static defaultProps = {
+    project: {}
+  };
+
   constructor(props) {
     super(props);
     this.classes = props.classes;
@@ -20,6 +22,7 @@ class ProjectPage extends React.Component {
   componentWillMount() {
     this.props.dispatch(fetchProject(this.props.match.params.projectId));
   }
+
   render() {
     return (
       <span>
@@ -40,19 +43,8 @@ class ProjectPage extends React.Component {
   }
 }
 
-ProjectPage.defaultProps = {
-  project: {}
-};
-const mapStateToProps = function(state) {
-  return {
-    project: state.project
-  };
-};
+const mapStateToProps = ({ project }) => ({ project });
 
-const mapDispatchToProps = function(dispatch) {
-  return {
-    dispatch
-  };
-};
+const mapDispatchToProps = dispatch => ({ dispatch });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectPage);

@@ -1,11 +1,5 @@
-import Promise from 'bluebird';
-import _ from 'lodash';
 import React from 'react';
-import CommitMiner from '../../services/CommitMiner.js';
-import AbstractComponent from './AbstractComponent.jsx';
 import { connect } from 'react-redux';
-import { fetchMostSentimental } from '../../redux/actions';
-/* UI Components */
 import {
   Table,
   TableBody,
@@ -14,12 +8,10 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table';
-import { Bar, Pie } from 'react-chartjs-2';
+import AbstractComponent from './AbstractComponent';
+import { fetchMostSentimental } from '../../redux/actions';
 
 class MostSentimental extends AbstractComponent {
-  constructor(props) {
-    super(props);
-  }
   loadData() {
     return this.props.dispatch(fetchMostSentimental(this.props.project));
   }
@@ -41,7 +33,7 @@ class MostSentimental extends AbstractComponent {
                 <TableHeaderColumn>Most negative comments</TableHeaderColumn>
               </TableRow>
             </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
+            <TableBody displayRowCheckbox={false} showRowHover>
               {this.props.worst.map((comment, idx) => (
                 <TableRow key={idx}>
                   <TableRowColumn>{comment.body}</TableRowColumn>
@@ -64,7 +56,7 @@ class MostSentimental extends AbstractComponent {
                 <TableHeaderColumn>Most positive comments</TableHeaderColumn>
               </TableRow>
             </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
+            <TableBody displayRowCheckbox={false} showRowHover>
               {this.props.best.map((comment, idx) => (
                 <TableRow key={idx}>
                   <TableRowColumn>{comment.body}</TableRowColumn>

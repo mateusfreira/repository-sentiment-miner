@@ -1,9 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
-import AbstractComponent from './AbstractComponent.jsx';
-
 import { connect } from 'react-redux';
+import AbstractComponent from './AbstractComponent';
+
 import { fetchWeekSentimentData } from '../../redux/actions';
 
 function getLineChartData(data) {
@@ -98,10 +98,6 @@ function getLineChartData(data) {
 }
 
 class SentimentByWeekday extends AbstractComponent {
-  constructor(props) {
-    super(props);
-  }
-
   loadData() {
     return this.props.dispatch(fetchWeekSentimentData(this.props.project));
   }
@@ -118,7 +114,7 @@ class SentimentByWeekday extends AbstractComponent {
   }
 }
 
-const mapStateToProps = function(state) {
+const mapStateToProps = state => {
   const weekSentiment = state.weekSentiment || { negative: [], positive: [] };
   return {
     weekSentiment: getLineChartData(weekSentiment)

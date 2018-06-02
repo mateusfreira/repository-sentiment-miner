@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Promise from 'bluebird';
 
 class CommitMiner {
   constructor(domain) {
@@ -16,7 +15,7 @@ class CommitMiner {
 
   startProject(url) {
     return axios.get(`http://${this.domain}:8081/import/${url}`, {
-      url: url
+      url
     });
   }
 
@@ -70,7 +69,7 @@ class CommitMiner {
     );
   }
 }
-CommitMiner.createService = function() {
-  return new CommitMiner(window.location.hostname);
-};
+
+CommitMiner.createService = () => new CommitMiner(window.location.hostname);
+
 export default CommitMiner;
