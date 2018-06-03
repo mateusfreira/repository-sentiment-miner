@@ -21,6 +21,10 @@ exports.run = (messages) => {
 ```
 
 # Instalation
+For now ping us on the chat [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
+
+Doker image comming soon :) 
+<!---
 ## Requirements
 * Node.js > 8 https://nodejs.org/en/
 ## From NPM
@@ -32,7 +36,7 @@ exports.run = (messages) => {
 * run `npm i`
 * run `npm run server` (To start the server)
     * run `npm run client` (To start the web client)
-
+-->
 ## Available tasks
 
 * Sentistrength (http://sentistrength.wlv.ac.uk/) https://github.com/mateusfreira/senti-strength-node (Native)
