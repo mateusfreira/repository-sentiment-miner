@@ -22,7 +22,7 @@ const HeaderOptions = () => (
 
 const Title = () => (
   <StyledTitle>
-    <Link to="/">Commits Miner</Link>
+    <Link to="/">Repository Sentiment Miner</Link>
   </StyledTitle>
 );
 
