@@ -35,12 +35,12 @@ exports.run = (messages) => {
 
 ## Available tasks
 
-    * Sentistrength (http://sentistrength.wlv.ac.uk/) https://github.com/mateusfreira/senti-strength-node (Native)
-    * AFINN-based sentiment https://github.com/thisandagain/sentiment (Native)
+* Sentistrength (http://sentistrength.wlv.ac.uk/) https://github.com/mateusfreira/senti-strength-node (Native)
+* AFINN-based sentiment https://github.com/thisandagain/sentiment (Native)
 
 
 # Needs help? 
-    Ping me on chat [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
+Ping me on chat [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
 
 
 
