@@ -1,9 +1,5 @@
 import _ from 'lodash';
-import {
-  RECEIVE_PROJECTS,
-  RECEIVE_PROJECT,
-  RECEIVE_COMPARATIVE
-} from '../actions';
+import { RECEIVE_PROJECTS, RECEIVE_PROJECT } from '../actions';
 
 const initialState = {};
 const actionsMap = {
@@ -21,6 +17,6 @@ const actionsMap = {
 const rootReducer = (state = initialState, action) => {
   const currentAction = actionsMap[action.type] || actionsMap.chartReducer;
   if (currentAction) return currentAction(state, action);
-  else return state;
+  return state;
 };
 export default rootReducer;

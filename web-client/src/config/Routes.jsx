@@ -3,10 +3,10 @@ import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 
 /* Screens */
-import HomeScreen from '../screens/Home.jsx';
-import Project from '../screens/Project.jsx';
-import ConfigScreen from '../screens/Config.jsx';
-import AddProject from '../screens/AddProject.jsx';
+import HomeScreen from '../screens/Home';
+import Project from '../screens/Project';
+import ConfigScreen from '../screens/Config';
+import AddProject from '../screens/AddProject';
 
 const Routes = () => (
   <Paths>

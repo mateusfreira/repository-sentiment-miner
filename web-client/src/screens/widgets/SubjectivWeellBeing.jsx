@@ -1,10 +1,9 @@
-import Promise from 'bluebird';
-import _ from 'lodash';
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import AbstractComponent from './AbstractComponent.jsx';
 import { connect } from 'react-redux';
+import AbstractComponent from './AbstractComponent';
 import { fetchSWB } from '../../redux/actions';
+
 function getSWBChartData(data) {
   return {
     labels: ['2 hours', '4 hours', '8 hours', '16 hours'],
@@ -83,10 +82,6 @@ function getSWBChartData(data) {
 }
 
 class SubjectivWeellBeing extends AbstractComponent {
-  constructor(props) {
-    super(props);
-  }
-
   loadData() {
     return this.props.dispatch(fetchSWB(this.props.project));
   }

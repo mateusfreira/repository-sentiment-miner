@@ -1,12 +1,11 @@
 import React from 'react';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
-import container from '../components/Container.jsx';
-import CommitMiner from '../services/CommitMiner.js';
-/* UI Components */
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import container from '../components/Container';
+import CommitMiner from '../services/CommitMiner';
 
 class AddProject extends React.Component {
   constructor(props) {
@@ -26,7 +25,7 @@ class AddProject extends React.Component {
   handleSubmit(event) {
     this.service
       .startProject(this.state.url)
-      .then(res => {
+      .then(() => {
         swal('Saved!', 'Your project has been added.', 'success');
       })
       .catch(err => {

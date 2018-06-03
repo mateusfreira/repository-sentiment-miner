@@ -1,20 +1,15 @@
-import Promise from 'bluebird';
-import _ from 'lodash';
 import React from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
-import CommitMiner from '../../services/CommitMiner.js';
-import AbstractComponent from './AbstractComponent.jsx';
-
+import { Pie } from 'react-chartjs-2';
 import { connect } from 'react-redux';
+import AbstractComponent from './AbstractComponent';
+
 import { fetchOnceContributors } from '../../redux/actions';
 
-import Util from './Util.js';
+import Util from './Util';
+
 const { getPieChartData } = Util;
 
 class OnceContributors extends AbstractComponent {
-  constructor(props) {
-    super(props);
-  }
   loadData() {
     return this.props.dispatch(fetchOnceContributors(this.props.project));
   }
@@ -38,14 +33,14 @@ class OnceContributors extends AbstractComponent {
             ['Once', 'More than once'],
             ['gray', 'green']
           )}
-          nredraw={true}
+          nredraw
         />
       </div>
     );
   }
 }
 
-const mapStateToProps = function(state) {
+const mapStateToProps = state => {
   const onceContributors = state.onceContributors || {
     once: [],
     moreThanOnce: []
