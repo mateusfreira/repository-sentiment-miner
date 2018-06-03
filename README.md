@@ -5,6 +5,10 @@ Repository Sentiment Miner is a tool for extracting sentiment from GitHub reposi
 # What does it do
 Sentiment repository miner all the complexity of processing repositories information dealing with all the Github API interactions and provides a high-level API to implement sentiment analysis tools on each interaction.
 
+<img width="1680" alt="screen shot 2018-06-03 at 08 21 24" src="https://user-images.githubusercontent.com/234049/40886033-4344fc78-6707-11e8-8a9d-b5dedd5e7b1e.png">
+
+
+
 * ## Paralelous
 * You can decide how many processes  run at the same time
 
