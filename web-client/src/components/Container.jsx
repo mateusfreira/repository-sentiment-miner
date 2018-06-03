@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
-const container = WrappedComponent => {
-  return class extends PureComponent {
+const container = WrappedComponent =>
+  class extends PureComponent {
     render() {
       return (
         <VerticalContainer>
@@ -15,7 +15,6 @@ const container = WrappedComponent => {
       );
     }
   };
-};
 
 const VerticalContainer = styled.div`
   top: 0;

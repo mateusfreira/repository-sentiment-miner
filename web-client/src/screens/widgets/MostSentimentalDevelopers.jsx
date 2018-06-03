@@ -1,9 +1,6 @@
-import _ from 'lodash';
 import React from 'react';
-import AbstractComponent from './AbstractComponent.jsx';
 import { connect } from 'react-redux';
-import { fetchMostSentimentalDevelopers } from '../../redux/actions';
-/* UI Components */
+import { Pie } from 'react-chartjs-2';
 import {
   Table,
   TableBody,
@@ -12,15 +9,13 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table';
-import { Bar, Pie } from 'react-chartjs-2';
+import { fetchMostSentimentalDevelopers } from '../../redux/actions';
+import AbstractComponent from './AbstractComponent';
+import Util from './Util';
 
-import Util from './Util.js';
 const { getPieChartData } = Util;
 
 class MostSentimentalDevelopers extends AbstractComponent {
-  constructor(props) {
-    super(props);
-  }
   loadData() {
     return this.props.dispatch(
       fetchMostSentimentalDevelopers(this.props.project)
@@ -43,11 +38,15 @@ class MostSentimentalDevelopers extends AbstractComponent {
               <TableHeaderColumn>Sentiment distribution</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody displayRowCheckbox={false} showRowHover={true}>
+          <TableBody displayRowCheckbox={false} showRowHover>
             {this.props.sentimentals.map((developer, idx) => (
               <TableRow key={idx}>
                 <TableRowColumn style={{ width: '30%' }}>
-                  <img src={developer.value.avatar_url} height="100" />
+                  <img
+                    src={developer.value.avatar_url}
+                    height="100"
+                    alt="Avatar"
+                  />
                   <br />
                   {developer.value.login}
                 </TableRowColumn>
@@ -64,7 +63,7 @@ class MostSentimentalDevelopers extends AbstractComponent {
                         developer.contribuitions.comments.sentiment.geral
                           .negative || 0
                     })}
-                    nredraw={true}
+                    nredraw
                   />
                 </TableRowColumn>
               </TableRow>

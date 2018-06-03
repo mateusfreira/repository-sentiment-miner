@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import swal from 'sweetalert2';
 import styled from 'styled-components';
-import container from '../components/Container.jsx';
-import CommitMiner from '../services/CommitMiner.js';
-/* UI Components */
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import shortid from 'shortid';
+import container from '../components/Container';
+import CommitMiner from '../services/CommitMiner';
 
 class ConfigForm extends Component {
   constructor(props) {
@@ -45,11 +45,11 @@ class ConfigForm extends Component {
     const config = { ...this.state };
     this.service
       .updateConfig(config)
-      .then(res => {
+      .then(() => {
         swal('Saved!', 'Your configuration has been updated.', 'success');
       })
-      .catch(err => {
-        swal('Ops...', `Check if commits miner is running correctly.`, 'error');
+      .catch(() => {
+        swal('Ops...', 'Check if commits miner is running correctly.', 'error');
       });
   }
 
@@ -72,8 +72,8 @@ class ConfigForm extends Component {
         name: 'nProcesses'
       }
     ];
-    return inputs.map((input, idx) => (
-      <span key={`configInput_${idx}`}>
+    return inputs.map(input => (
+      <span key={shortid.generate()}>
         <TextField
           floatingLabelText={input.label}
           name={input.name}

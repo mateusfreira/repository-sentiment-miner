@@ -1,14 +1,8 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
-
 import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { RECEIVE_PROJECTS } from '../redux/actions';
-
-import swal from 'sweetalert2';
 import styled from 'styled-components';
-import CommitMiner from '../services/CommitMiner.js';
-/* UI Components */
+import { connect } from 'react-redux';
+import shortid from 'shortid';
 import {
   Table,
   TableBody,
@@ -20,32 +14,9 @@ import {
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 import AddIcon from 'material-ui/svg-icons/content/add';
-import GridCard from '../components/GridCard.jsx';
-
-function updateProjectState(project, projects, component) {
-  component.service
-    .getProjectStatus(project)
-    .then(({ data }) => Object.assign(project, data))
-    .then(() =>
-      component.setState({
-        projects
-      })
-    );
-}
-const mapStateToProps = function(state) {
-  return {
-    projects: state.projects
-  };
-};
-
-const mapDispatchToProps = function(dispatch) {
-  return bindActionCreators(
-    {
-      RECEIVE_PROJECTS
-    },
-    dispatch
-  );
-};
+import { RECEIVE_PROJECTS } from '../redux/actions';
+import CommitMiner from '../services/CommitMiner';
+import GridCard from '../components/GridCard';
 
 class ProjectTable extends Component {
   constructor(props) {
@@ -69,7 +40,7 @@ class ProjectTable extends Component {
           'error'
         );
       });
-  }*/
+  } */
 
   loadProject(rowNum) {
     const name = this.props.projects[rowNum]._id;
@@ -93,7 +64,7 @@ class ProjectTable extends Component {
     );
   }
   render() {
-    const projects = this.props.projects;
+    const { projects } = this.props;
     return (
       <GridCard>
         {projects && projects.length ? (
@@ -106,9 +77,9 @@ class ProjectTable extends Component {
                 <TableHeaderColumn>Progress</TableHeaderColumn>
               </TableRow>
             </TableHeader>
-            <TableBody displayRowCheckbox={false} showRowHover={true}>
-              {projects.map((project, idx) => (
-                <ClickableRow key={`p${idx}`}>
+            <TableBody displayRowCheckbox={false} showRowHover>
+              {projects.map(project => (
+                <ClickableRow key={shortid.generate()}>
                   <TableRowColumn>{project.name}</TableRowColumn>
                   <TableRowColumn>{project.stargazers_count}</TableRowColumn>
                   <TableRowColumn>{project.forks_count}</TableRowColumn>
@@ -142,5 +113,10 @@ const EmptyMessage = styled.div`
 const StyledButton = styled(FlatButton)`
   margin-top: 12px !important;
 `;
+
+const mapStateToProps = ({ projects }) => ({ projects });
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ RECEIVE_PROJECTS }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectTable);

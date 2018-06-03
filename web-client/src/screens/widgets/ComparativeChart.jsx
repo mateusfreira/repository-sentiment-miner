@@ -1,12 +1,10 @@
-import Promise from 'bluebird';
-import _ from 'lodash';
 import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
-import CommitMiner from '../../services/CommitMiner.js';
-import Util from './Util.js';
-import AbstractComponent from './AbstractComponent.jsx';
 import { connect } from 'react-redux';
+import Util from './Util';
+import AbstractComponent from './AbstractComponent';
 import { fetchComparativeData } from '../../redux/actions';
+
 const { getPieChartData } = Util;
 
 const emptyState = {
@@ -158,26 +156,26 @@ class ComparativeChart extends AbstractComponent {
           data={this.props.comparative.data}
           height={50}
           options={this.comparativeOptions}
-          nredraw={true}
+          nredraw
         />
         <div style={{ width: '33%', float: 'left' }}>
           <h2>Comments </h2>
-          <Pie data={this.props.chartData} nredraw={true} />
+          <Pie data={this.props.chartData} nredraw />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Reviews </h2>
-          <Pie data={this.props.reviewChartData} nredraw={true} />
+          <Pie data={this.props.reviewChartData} nredraw />
         </div>
         <div style={{ width: '33%', float: 'left' }}>
           <h2> Commits </h2>
-          <Pie data={this.props.commitsChartData} nredraw={true} />
+          <Pie data={this.props.commitsChartData} nredraw />
         </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = function(state) {
+const mapStateToProps = state => {
   const { project, general } = state.comparative || emptyComparative;
   return {
     comparative: {
