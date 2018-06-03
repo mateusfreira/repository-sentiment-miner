@@ -141,7 +141,7 @@ class ComparativeChart extends AbstractComponent {
   }
 
   loadData() {
-    return this.props.dispatch(fetchComparativeData());
+    return this.props.dispatch(fetchComparativeData(this.props.project));
   }
   renderAfterLoad() {
     return (
