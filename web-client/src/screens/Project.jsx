@@ -38,6 +38,9 @@ class ProjectPage extends React.Component {
     );
   }
 }
+ProjectPage.defaultProps = {
+  project: {}
+};
 
 const mapStateToProps = ({ project }) => ({ project });
 
