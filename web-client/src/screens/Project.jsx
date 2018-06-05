@@ -10,10 +10,6 @@ import SubjectivWeellBeing from './widgets/SubjectivWeellBeing';
 import { fetchProject } from '../redux/actions/index';
 
 class ProjectPage extends React.Component {
-  static defaultProps = {
-    project: {}
-  };
-
   constructor(props) {
     super(props);
     this.classes = props.classes;
@@ -42,6 +38,9 @@ class ProjectPage extends React.Component {
     );
   }
 }
+ProjectPage.defaultProps = {
+  project: {}
+};
 
 const mapStateToProps = ({ project }) => ({ project });
 

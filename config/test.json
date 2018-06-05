@@ -1,0 +1,30 @@
+{
+    "sentiment": {
+        "tasks": [{
+            "config": "./sentiment",
+            "propertyName": "sentistrength_new",
+            "methodName": "detectSentiment",
+            "fileName": "senti-strength-node",
+            "className": "SentiStrength"
+        }, {
+            "config": {},
+            "propertyName": "sentiment_afinn",
+            "methodName": "analyze",
+            "fileName": "sentiment",
+            "stratefy": "single-sync"
+        }]
+    },
+    "mongo": {
+        "url": "",
+        "opt": {
+            "user": "admin",
+            "pass": "",
+            "auth": {
+                "authdb": "admin"
+            }
+        }
+    },
+    "github": {
+        "tokens": []
+    }
+}

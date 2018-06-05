@@ -1,7 +1,8 @@
 # Repository Sentiment Miner
 
 Repository Sentiment Miner is a tool for extracting sentiment from GitHub repositories
-[![Build Status](https://travis-ci.org/mateusfreira/commits-miner.svg?branch=master)](https://travis-ci.org/mateusfreira/commits-miner) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
+[![Build Status](https://travis-ci.org/mateusfreira/repository-sentiment-miner.svg?branch=master)](https://travis-ci.org/mateusfreira/repository-sentiment-miner)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/commits-miner/Lobby)
 # What does it do
 Sentiment repository miner all the complexity of processing repositories information dealing with all the Github API interactions and provides a high-level API to implement sentiment analysis tools on each interaction.
 
