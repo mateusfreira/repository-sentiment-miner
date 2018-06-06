@@ -1,7 +1,8 @@
 const { GitLabImporter } = require('../service/sentiment/GitLabImporter.js');
 
 const should = require("should");
-describe("GitLabImporter", () => {
+describe("GitLabImporter", function() {
+    this.timeout(10000);
     const gitLab = new GitLabImporter();
     it("should return the project data", () => {//Skiped until we add nocks
         return gitLab.getProject("https://gitlab.com/mateusfreira/node-stackoverflow-jobs").then((r) => {
@@ -12,6 +13,7 @@ describe("GitLabImporter", () => {
     it("should get all the PRs from a project", async ()=> {
         const project = await gitLab.getProject('https://gitlab.com/mateusfreira/node-stackoverflow-jobs');
         const pulls = await gitLab.getPulls(project);
+        console.log(pulls);
         pulls.length.should.be.above(0);
     });
 
@@ -24,7 +26,6 @@ describe("GitLabImporter", () => {
     it("should get all the comments from a project", async ()=> {
         const project = await gitLab.getProject('https://gitlab.com/mateusfreira/node-stackoverflow-jobs');
         const [pull] = await gitLab.getPulls(project);
-        pull.title.should.be.equal("Little error when you were typing your name");
         const [firstComment] = await gitLab.getPullComments(pull);
         firstComment.body.should.be.equal("thanks");
     });
