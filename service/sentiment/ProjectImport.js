@@ -13,12 +13,12 @@ const Commit = models.Commit;
 const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
 const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
 const { SentimentTaskManager  } = require('./SentimentTaskManager.js');
+const { Importer  } = require('./Importer.js');
 
 const sentimentTaskManager = new SentimentTaskManager(config);
 
-const pendingDevelopers = {
+const pendingDevelopers = {};
 
-};
 
 let running;
 
@@ -82,6 +82,7 @@ function applySentiment(data) {
 }
 
 function importProject(projectUrl) {
+    const importer = Importer.importerFactory(projectUrl);
     running = true;
     startDeveloperCreatorQueue();
     return gitHubUtil
