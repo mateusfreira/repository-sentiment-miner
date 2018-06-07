@@ -29,6 +29,7 @@ class GitLabImporter {
     getPullCommits(pull) {
         return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/commits`);
     }
+
     getPullReviews(pull) {
         return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/notes`).then(notes => _.filter(notes,  { "type": "DiffNote" }));
     }

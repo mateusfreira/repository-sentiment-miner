@@ -1,4 +1,6 @@
 language: node_js
+before_install:
+    openssl aes-256-cbc -K $encrypted_3cb7980c1f42_key -iv $encrypted_3cb7980c1f42_iv -in ./specs/fixtures/config/default.json.enc -out config/test.json -d
 node_js:
     - "8"
     - "node"
