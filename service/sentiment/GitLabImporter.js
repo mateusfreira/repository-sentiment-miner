@@ -13,20 +13,25 @@ class GitLabImporter {
         const requestUrl = `${GIT_LAB_API}/projects/${encodeURIComponent(projectUrl)}`;
         return getGitLabData(requestUrl);
     }
+
     getPulls(project) {
         return getGitLabData(project._links.merge_requests);
 
     }
-    getCommits() {
 
+    getCommits(project) {
+        return getGitLabData(`${GIT_LAB_API}/projects/${project.id}/repository/commits`);
     }
+
     getPullComments(pull) {
-        return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/notes`);
+        return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/notes`).then(notes => _.filter(notes,  { "type": null }))
     }
     getPullCommits(pull) {
-
+        return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/commits`);
     }
-    getPullReviews(pull) {}
+    getPullReviews(pull) {
+        return getGitLabData(`${GIT_LAB_API}/projects/${pull.project_id}/merge_requests/${pull.iid}/notes`).then(notes => _.filter(notes,  { "type": "DiffNote" }));
+    }
 }
 
 function getGitLabData(uri, method = `GET`) {
