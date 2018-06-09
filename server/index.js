@@ -32,21 +32,11 @@ const {
     ObjectId
 } = require('mongoose').Types.ObjectId;
 
-async function restoreState(persistenceManager) {
-    const projectsName = await persistenceManager.findProjectsName();
-    projectsName.map(async project => {
-        const projectData = await persistenceManager.getProject(project.name);
-        console.log(projectData);
-        if (!projectData.completed) {
-            new ProjectAnaliser(projectData).analise();
-        }
-    })
-}
+ 
 async function init() {
     const config = await persistenceManager.loadConfig();
     console.log(config);
     persistenceManager.changeResultPath(config.resultPath || '/tmp');
-    restoreState(persistenceManager);
     const server = restify.createServer({
         name: 'commits-miner',
         version: '1.0.0'
@@ -101,7 +91,16 @@ async function init() {
         const project = await importProject(projectName);
         console.log(`Project ${project.name}`);
     });
-
+    server.get('/import', async function(req, res, next) {
+        console.log('receive start request...');
+        const { url  } = req.query;
+        res.send({
+            ok: true
+        });
+        next();
+        const project = await importProject(url);
+        console.log(`Project ${project.name}`);
+    });
     server.post('/start', async function(req, res, next) {
         console.log('receive start request...');
         const url = req.body.url;

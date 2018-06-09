@@ -13,12 +13,12 @@ const Commit = models.Commit;
 const { processSWB } = require('../../service/sentiment/SubjectiveWellBeing.js');
 const { processDevelopersProfile } = require('../../service/sentiment/DeveloperProcess.js');
 const { SentimentTaskManager  } = require('./SentimentTaskManager.js');
+const { Importer  } = require('./Importer.js');
 
 const sentimentTaskManager = new SentimentTaskManager(config);
 
-const pendingDevelopers = {
+const pendingDevelopers = {};
 
-};
 
 let running;
 
@@ -82,21 +82,22 @@ function applySentiment(data) {
 }
 
 function importProject(projectUrl) {
+    const importer = Importer.importerFactory(projectUrl);
     running = true;
     startDeveloperCreatorQueue();
-    return gitHubUtil
-        .getData(`https://api.github.com/repos/${projectUrl}`, ['pulls_url', 'commits_url'])
-        .then((project) => {
+    return  importer.getProject(projectUrl)
+            .then((project) => {
             const mongoProject = new Project(project);
             mongoProject.set('_commits', undefined);
             mongoProject.set('_pulls', undefined);
             mongoProject.set('percent', 50);
             return mongoProject.save()
-                .then(() => Promise.map(project._pulls, (pull) => {
+                .then(() => importer.getPulls(project))
+                .then((pulls) => Promise.map(pulls, (pull) => {
                     return Promise.all([
-                        gitHubUtil.getData(pull.comments_url),
-                        gitHubUtil.getData(pull.review_comments_url),
-                        gitHubUtil.getData(pull.commits_url).then(commits => commits.map(c => {
+                        importer.getPullComments(pull),
+                        importer.getPullReviews(pull),
+                        importer.getPullCommits(pull).then(commits => commits.map(c => {
                             c.body = _.get(c, 'commit.message');
                             return c;
                         })),
@@ -107,9 +108,6 @@ function importProject(projectUrl) {
                             interaction._project = mongoProject._id;
                             return checkDeveloper(interaction);
                         }).then(() => {
-                            delete pull._commits;
-                            delete pull._comments;
-                            delete pull._reviews;
                             pull._events = _events;
                             const pullMongo = new Pull(pull);
                             return Promise.all([
@@ -135,7 +133,8 @@ function importProject(projectUrl) {
                 })).then((pulls) => {
                     return project;
                 }).then(function(project) {
-                    return sentimentTaskManager.applySentiment(project._commits.map((c) => {
+                    return importer.getCommits(project)
+                        .then( (commits) => sentimentTaskManager.applySentiment(commits.map((c) => {
                             c.body = _.get(c, 'commit.message')
                             return c;
                         }), mongoProject)
@@ -143,7 +142,7 @@ function importProject(projectUrl) {
                             c._project = mongoProject._id;
                             return new Commit(c).save();
                         }))
-                        .then(() => project);
+                        .then(() => project));
                 }).then(function(project) {
                     mongoProject.set('percent', 100);
                     return mongoProject.save();
