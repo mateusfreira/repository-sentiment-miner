@@ -14,7 +14,8 @@ class CommitMiner {
   }
 
   startProject(url) {
-    return axios.get(`http://${this.domain}:8081/import/${url}`, {
+    return axios.get(`http://${this.domain}:8081/import`, {
+      params: { url },
       url
     });
   }
