@@ -114,6 +114,7 @@ class Reports {
             }),
         });
     }
+
     swbRelevantChange(query) {
         const project = query._project;
         const hour = 2;
@@ -137,7 +138,7 @@ class Reports {
 function getSwbReportData(data) {
     const onlyComment = data.filter(swb => swb.entity === 'comment');
     return {
-        general: getRelevantChange(onlyComment, () => true),
+        general: getRelevantChange(onlyComment),
         positive: getRelevantChange(onlyComment, swb => swb.commentSentiment > 0),
         negative: getRelevantChange(onlyComment, swb => swb.commentSentiment < 0),
     };
@@ -151,7 +152,7 @@ function getSwbList(devs, hour, project) {
         .reduce((agg, current) => agg.concat(current), []);
 }
 
-function getRelevantChange(data, filter) {
+function getRelevantChange(data, filter = ()=> true) {
     const filteredData = data.filter(filter).filter(filterDetectable);
     const relevantChange = filteredData.filter(filterRelevantChange);
     return {
@@ -162,11 +163,11 @@ function getRelevantChange(data, filter) {
 }
 
 function filterRelevantChange(swb) {
-    return swb.result >= 1 || swb.result <= -1;
+    return swb.result > 1 || swb.result < -1;
 }
 
 function filterDetectable(swb) {
-    return hasInteraction(swb.swbBeforeComments) && hasInteraction(swb.swbAfterComments);
+    return true;//hasInteraction(swb.swbBeforeComments) && hasInteraction(swb.swbAfterComments);
 }
 
 function hasInteraction(swbTime) {

@@ -17,8 +17,6 @@ class OnceContributors extends AbstractComponent {
     return (
       <div
         style={{
-          'border-left': '1px solid gray',
-          'border-top': '1px solid gray',
           width: '49%',
           float: 'left'
         }}
